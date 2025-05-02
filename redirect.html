@@ -3,100 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirigiendo | ShortLink</title>
-    <!-- Estilos incrustados -->
+    <title>Redirigiendo | URLy</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background: #f0f4f8;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            color: #333;
-            text-align: center;
+            background: #f0f4f8;
+            flex-direction: column;
+            font-family: 'Arial', sans-serif;
         }
-        .container {
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 500px;
+        .loader {
+            border: 5px solid #e2e8f0;
+            border-top: 5px solid #4361ee;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
         }
-        h2 {
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-text {
             color: #4361ee;
-            margin-bottom: 1rem;
-        }
-        p {
-            font-size: 1.1rem;
-            margin: 10px 0;
-        }
-        #countdown {
+            font-size: 1.2rem;
             font-weight: bold;
-            color: #4361ee;
-        }
-        a {
-            color: #4361ee;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
         }
     </style>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <!-- Configuración Firebase -->
+    <script src="/firebase.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>🔗 Redirigiendo...</h2>
-        <p>Serás llevado a <span id="originalUrl"></span> en <span id="countdown">5</span> segundos.</p>
-        <p><a href="/">← Volver al acortador</a></p>
-    </div>
+    <div class="loader"></div>
+    <div class="loading-text">Cargando</div>
 
-    <!-- Script incrustado -->
     <script>
-        // Config Firebase (¡Igual que en index.html!)
-        firebase.initializeApp({
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO"
-        });
-        const db = firebase.firestore();
-
         // Obtener ID de la URL (ej: /abc123)
         const shortId = window.location.pathname.substring(1);
 
         // Buscar en Firestore y redirigir
         db.collection("urls").doc(shortId).get().then((doc) => {
             if (doc.exists) {
-                const urlData = doc.data();
-                document.getElementById("originalUrl").textContent = urlData.longUrl;
-
-                // Contador regresivo
-                let countdown = 5;
-                const timer = setInterval(() => {
-                    countdown--;
-                    document.getElementById("countdown").textContent = countdown;
-                    if (countdown <= 0) {
-                        clearInterval(timer);
-                        window.location.href = urlData.longUrl;
-                        // Actualizar clics
-                        db.collection("urls").doc(shortId).update({
-                            clicks: firebase.firestore.FieldValue.increment(1)
-                        });
-                    }
-                }, 1000);
+                window.location.href = doc.data().longUrl; // Redirección inmediata
+                db.collection("urls").doc(shortId).update({
+                    clicks: firebase.firestore.FieldValue.increment(1)
+                });
             } else {
-                document.querySelector(".container").innerHTML = `
-                    <h2>❌ Enlace no encontrado</h2>
-                    <p>Este enlace acortado no existe.</p>
-                    <a href="/">Volver al inicio</a>
-                `;
+                window.location.href = "/"; // Si no existe, va al inicio
             }
         });
     </script>
