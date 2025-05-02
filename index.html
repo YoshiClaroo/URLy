@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShortLink - Acortador de URLs</title>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Estilos incrustados -->
+    <title>URLy - Acortador de URLs</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -31,8 +27,7 @@
         }
         h1 {
             color: #4361ee;
-            margin-bottom: 1.5rem;
-            font-size: 2.2rem;
+            margin-bottom: 1rem;
         }
         .form-group {
             display: flex;
@@ -44,11 +39,6 @@
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             font-size: 16px;
-            transition: border 0.3s;
-        }
-        input:focus {
-            border-color: #4361ee;
-            outline: none;
         }
         button {
             padding: 12px;
@@ -78,14 +68,27 @@
             font-weight: bold;
             word-break: break-all;
         }
-        .hidden {
-            display: none !important;
+        .stats {
+            margin-top: 15px;
+            text-align: left;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .copy-btn {
+            background: #4CAF50;
+            margin-top: 10px;
+        }
+        .copy-btn:hover {
+            background: #45a049;
         }
     </style>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>ShortLink ✨</h1>
+        <h1>URLy ✨</h1>
         <p>Acorta tus URLs largas en segundos</p>
         
         <div class="form-group">
@@ -97,6 +100,11 @@
         <div id="result" class="hidden">
             <p>✅ ¡Listo! Tu enlace acortado:</p>
             <a id="shortUrl" target="_blank">...</a>
+            <button id="copyBtn" class="copy-btn">Copiar enlace</button>
+            <div class="stats">
+                <p>👆 <strong id="clicks">0</strong> clics</p>
+                <p>📅 Creado el: <span id="createdAt">...</span></p>
+            </div>
         </div>
     </div>
 
@@ -122,6 +130,9 @@
         const shortenBtn = document.getElementById("shortenBtn");
         const resultDiv = document.getElementById("result");
         const shortUrlLink = document.getElementById("shortUrl");
+        const copyBtn = document.getElementById("copyBtn");
+        const clicksSpan = document.getElementById("clicks");
+        const createdAtSpan = document.getElementById("createdAt");
 
         // Acortar URL
         shortenBtn.addEventListener("click", async () => {
@@ -147,6 +158,8 @@
                 // Mostrar resultado
                 shortUrlLink.href = shortUrl;
                 shortUrlLink.textContent = shortUrl;
+                clicksSpan.textContent = "0";
+                createdAtSpan.textContent = new Date().toLocaleDateString();
                 resultDiv.classList.remove("hidden");
 
                 // Limpiar campos
@@ -156,6 +169,13 @@
                 console.error("Error:", error);
                 alert("Error al acortar. Intenta nuevamente.");
             }
+        });
+
+        // Copiar enlace
+        copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(shortUrlLink.textContent)
+                .then(() => alert("¡Enlace copiado! 📋"))
+                .catch(() => alert("Error al copiar"));
         });
 
         // Generar ID aleatorio
