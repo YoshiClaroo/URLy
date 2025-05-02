@@ -1,147 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Acortador de URLs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background: #ffffff;
       color: #1d4ed8;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
+      font-family: sans-serif;
       text-align: center;
+      padding: 20px;
     }
     input, button {
       padding: 10px;
-      margin: 10px;
-      font-size: 1rem;
+      margin: 5px;
+      font-size: 1em;
       border: 1px solid #1d4ed8;
-      border-radius: 4px;
+      border-radius: 5px;
     }
     button {
-      background-color: #1d4ed8;
+      background: #1d4ed8;
       color: white;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
     }
     .url-item {
-      margin: 20px 0;
+      margin-top: 10px;
+      border: 1px solid #ddd;
       padding: 10px;
-      background-color: #f0f4f8;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      width: 80%;
-      max-width: 500px;
-    }
-    .url-item a {
-      color: #1d4ed8;
-      text-decoration: none;
-    }
-    .url-item .copy-btn {
-      background-color: #34d399;
-    }
-    .url-item .copy-btn:hover {
-      background-color: #10b981;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
   <h1>Acortador de URLs</h1>
-  <input type="text" id="alias" placeholder="Introduce tu alias">
-  <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí">
-  <button onclick="shortenUrl()">Acortar</button>
+  <input type="text" id="alias" placeholder="Tu alias">
+  <input type="text" id="longUrl" placeholder="URL larga">
+  <button id="shortenBtn">Acortar</button>
   <div id="result"></div>
-  <h2>Mis URLs Acortadas</h2>
+  <h2>Mis URLs</h2>
   <div id="urlsList"></div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-      authDomain: "urlyi-b3947.firebaseapp.com",
-      projectId: "urlyi-b3947",
-      storageBucket: "urlyi-b3947.appspot.com",
-      messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-      measurementId: "G-VPHWGQG61Q"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    import { db } from './firebase.js';
+    import { collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     function generateShortId(length = 6) {
       const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let result = '';
-      for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     }
 
-    async function shortenUrl() {
+    document.getElementById('shortenBtn').addEventListener('click', async () => {
       const alias = document.getElementById('alias').value.trim();
       const longUrl = document.getElementById('longUrl').value.trim();
-      if (!longUrl || !alias) return;
+      if (!alias || !longUrl) return alert("Ingresa alias y URL");
 
       const shortId = generateShortId();
-      const shortUrl = `${window.location.origin}/${shortId}`;
+      const shortUrl = `${window.location.origin}/redirect.html?c=${shortId}`;
 
-      // Guardar en Firestore
       await addDoc(collection(db, "urls"), {
-        shortId,
-        longUrl,
         alias,
-        clicks: 0,
-        createdAt: serverTimestamp()
+        longUrl,
+        shortId,
+        createdAt: serverTimestamp(),
+        clicks: 0
       });
 
-      document.getElementById('result').innerHTML = `URL corta: <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
-      fetchUrls();
-    }
+      document.getElementById('result').innerHTML = `
+        <p><strong>URL acortada:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+      `;
+      loadUrls();
+    });
 
-    async function fetchUrls() {
-      const querySnapshot = await getDocs(collection(db, "urls"));
-      const urlsList = document.getElementById('urlsList');
-      urlsList.innerHTML = ''; // Limpiar la lista actual
+    async function loadUrls() {
+      const snapshot = await getDocs(collection(db, "urls"));
+      const container = document.getElementById("urlsList");
+      container.innerHTML = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const shortUrl = `${window.location.origin}/redirect.html?c=${d.shortId}`;
+        const createdAt = d.createdAt?.seconds ? new Date(d.createdAt.seconds * 1000).toLocaleString() : 'Desconocido';
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const urlItem = document.createElement('div');
-        urlItem.classList.add('url-item');
-
-        const creationDate = new Date(data.createdAt.seconds * 1000).toLocaleString();
-        const clicks = data.clicks;
-
-        urlItem.innerHTML = `
-          <p>Alias: ${data.alias}</p>
-          <p>URL: <a href="${window.location.origin}/${data.shortId}" target="_blank">${window.location.origin}/${data.shortId}</a></p>
-          <p>Fecha de creación: ${creationDate}</p>
-          <p>Vistas: ${clicks}</p>
-          <button class="copy-btn" onclick="copyUrl('${window.location.origin}/${data.shortId}')">Copiar URL</button>
+        const item = document.createElement("div");
+        item.className = "url-item";
+        item.innerHTML = `
+          <p><strong>Alias:</strong> ${d.alias}</p>
+          <p><strong>Original:</strong> ${d.longUrl}</p>
+          <p><strong>Acortada:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+          <p><strong>Creado:</strong> ${createdAt}</p>
+          <p><strong>Vistas:</strong> ${d.clicks}</p>
+          <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
         `;
-
-        urlsList.appendChild(urlItem);
+        container.appendChild(item);
       });
     }
 
-    function copyUrl(url) {
-      navigator.clipboard.writeText(url)
-        .then(() => alert("URL copiada al portapapeles"))
-        .catch((err) => alert("Error al copiar la URL: " + err));
-    }
-
-    // Cargar las URLs desde Firebase al cargar la página
-    window.onload = fetchUrls;
+    loadUrls();
   </script>
 </body>
 </html>
