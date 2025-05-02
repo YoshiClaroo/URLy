@@ -1,51 +1,59 @@
-<!-- index.html --><!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acortador de URLs</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>URLy - Acortador de Enlaces</title>
   <style>
     body {
-      background-color: white;
-      color: #0044cc;
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 2rem;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      flex-direction: column;
+      color: #4361ee;
     }
     h1 {
       font-size: 2rem;
-      margin-bottom: 1rem;
     }
     input, button {
-      padding: 0.6rem;
-      margin: 0.4rem;
-      font-size: 1rem;
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #4361ee;
+      border-radius: 5px;
+      width: 300px;
     }
-    .result, .url-card {
-      border: 1px solid #0044cc;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
-      display: inline-block;
-      text-align: left;
-      max-width: 90%;
+    button {
+      background-color: #4361ee;
+      color: white;
+      cursor: pointer;
+    }
+    .url-info {
+      margin-top: 20px;
+      text-align: center;
     }
     .copy-btn {
-      background-color: #0044cc;
-      color: white;
-      border: none;
-      padding: 0.4rem 0.8rem;
-      cursor: pointer;
-      border-radius: 5px;
+      margin-top: 10px;
+      background: #f1f1f1;
+      color: #4361ee;
+      border: 1px dashed #4361ee;
     }
   </style>
 </head>
 <body>
-  <h1>Acortador de URLs</h1>
-  <input type="text" id="alias" placeholder="Alias (opcional)">
-  <input type="text" id="original-url" placeholder="Pega tu URL aquí">
-  <button onclick="acortarUrl()">Acortar</button>  <div id="resultado" class="result"></div>  <script type="module">
+  <h1>URLy</h1>
+  <input type="text" id="longUrl" placeholder="Pega tu enlace largo aquí" />
+  <input type="text" id="alias" placeholder="Alias personalizado (opcional)" />
+  <button id="shortenBtn">Acortar URL</button>
+  <div class="url-info" id="result"></div>
+
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -53,44 +61,41 @@
       projectId: "urlyi-b3947",
       storageBucket: "urlyi-b3947.appspot.com",
       messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9"
+      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+      measurementId: "G-VPHWGQG61Q"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    function generarIdAleatorio() {
-      return Math.random().toString(36).substring(2, 8);
-    }
+    document.getElementById("shortenBtn").addEventListener("click", async () => {
+      const longUrl = document.getElementById("longUrl").value.trim();
+      const alias = document.getElementById("alias").value.trim() || Math.random().toString(36).substring(2, 8);
 
-    async function acortarUrl() {
-      const alias = document.getElementById("alias").value || generarIdAleatorio();
-      const original = document.getElementById("original-url").value;
-      if (!original) return alert("Ingresa una URL válida");
+      if (!longUrl) return alert("Por favor, pega una URL.");
 
-      const ref = doc(db, "urls", alias);
-      const exists = await getDoc(ref);
+      const docRef = doc(db, "urls", alias);
+      const docSnap = await getDoc(docRef);
 
-      if (exists.exists()) return alert("El alias ya está en uso. Elige otro o deja en blanco.");
+      if (docSnap.exists()) {
+        alert("Este alias ya está en uso.");
+        return;
+      }
 
-      const data = {
-        original,
-        created: new Date().toISOString(),
-        views: 0
-      };
+      await setDoc(docRef, {
+        longUrl,
+        alias,
+        clicks: 0,
+        createdAt: serverTimestamp()
+      });
 
-      await setDoc(ref, data);
-
-      const shortUrl = `${location.origin}/${alias}`;
-      document.getElementById("resultado").innerHTML = `
-        <div class="url-card">
-          <p><strong>Alias:</strong> ${alias}</p>
-          <p><strong>Original:</strong> ${original}</p>
-          <p><strong>Acortada:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-          <p><strong>Creado:</strong> ${new Date().toLocaleString()}</p>
-          <p><strong>Vistas:</strong> 0</p>
-          <button class="copy-btn" onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
-        </div>`;
-    }
-  </script></body>
+      const shortUrl = `${window.location.origin}/r/${alias}`;
+      document.getElementById("result").innerHTML = `
+        <p><strong>URL corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+        <button class="copy-btn" onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
+        <p><strong>Alias:</strong> ${alias}</p>
+      `;
+    });
+  </script>
+</body>
 </html>
