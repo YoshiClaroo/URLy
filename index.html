@@ -1,112 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>URLy ✨ - Acortador de URLs</title>
+  <meta charset="UTF-8">
+  <title>Acortador de URLs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      color: #333;
-    }
-    .container {
-      background: white;
-      padding: 2.5rem;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-      width: 90%;
-      max-width: 500px;
-      text-align: center;
-    }
-    h1 {
-      margin-bottom: 0.5rem;
-      color: #2c3e50;
-    }
-    p {
-      margin-bottom: 1.5rem;
-    }
-    .form-group {
+      background: #ffffff;
+      color: #1d4ed8;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
     }
-    input {
-      padding: 0.8rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    input, button {
+      padding: 10px;
+      margin: 10px;
       font-size: 1rem;
-      width: 100%;
-      box-sizing: border-box;
+      border: 1px solid #1d4ed8;
+      border-radius: 4px;
     }
     button {
-      padding: 0.9rem;
-      background-color: #3498db;
+      background-color: #1d4ed8;
       color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #2980b9;
     }
     #result {
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid #eee;
-    }
-    #result.hidden {
-      display: none;
-    }
-    .copy-btn {
-      margin-top: 1rem;
-      background-color: #2ecc71;
-    }
-    .copy-btn:hover {
-      background-color: #27ae60;
-    }
-    .stats {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-      color: #555;
+      margin-top: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>URLy ✨</h1>
-    <p>Acorta tus URLs largas en segundos</p>
-
-    <div class="form-group">
-      <input type="url" id="urlInput" placeholder="https://ejemplo.com/super-url-larga" required />
-      <input type="text" id="aliasInput" placeholder="alias-opcional" />
-      <button id="shortenBtn">Acortar URL</button>
-    </div>
-
-    <div id="result" class="hidden">
-      <p>✅ ¡Listo! Tu enlace acortado:</p>
-      <a id="shortUrl" target="_blank">...</a>
-      <button id="copyBtn" class="copy-btn">Copiar enlace</button>
-      <div class="stats">
-        <p>👆 <strong id="clicks">0</strong> clics</p>
-        <p>📅 Creado el: <span id="createdAt">...</span></p>
-      </div>
-    </div>
-  </div>
+  <h1>Acortador de URLs</h1>
+  <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí">
+  <button onclick="shortenUrl()">Acortar</button>
+  <div id="result"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -120,60 +56,31 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const analytics = getAnalytics(app);
 
-    const urlInput = document.getElementById("urlInput");
-    const aliasInput = document.getElementById("aliasInput");
-    const shortenBtn = document.getElementById("shortenBtn");
-    const resultDiv = document.getElementById("result");
-    const shortUrlLink = document.getElementById("shortUrl");
-    const copyBtn = document.getElementById("copyBtn");
-    const clicksSpan = document.getElementById("clicks");
-    const createdAtSpan = document.getElementById("createdAt");
-
-    shortenBtn.addEventListener("click", async () => {
-      const longUrl = urlInput.value.trim();
-      const alias = aliasInput.value.trim();
-
-      if (!longUrl) {
-        alert("Por favor, ingresa una URL válida.");
-        return;
+    function generateShortId(length = 6) {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
       }
+      return result;
+    }
 
-      try {
-        const shortId = alias || generateShortId();
-        const shortUrl = `${window.location.origin}/${shortId}`;
+    async function shortenUrl() {
+      const longUrl = document.getElementById('longUrl').value.trim();
+      if (!longUrl) return;
 
-        await setDoc(doc(db, "urls", shortId), {
-          longUrl: longUrl,
-          createdAt: serverTimestamp(),
-          clicks: 0
-        });
+      const shortId = generateShortId();
+      const shortUrl = `${window.location.origin}/${shortId}`;
 
-        shortUrlLink.href = shortUrl;
-        shortUrlLink.textContent = shortUrl;
-        clicksSpan.textContent = "0";
-        createdAtSpan.textContent = new Date().toLocaleDateString();
-        resultDiv.classList.remove("hidden");
+      await addDoc(collection(db, "urls"), {
+        shortId,
+        longUrl,
+        clicks: 0,
+        createdAt: serverTimestamp()
+      });
 
-        urlInput.value = "";
-        aliasInput.value = "";
-
-        logEvent(analytics, 'url_acortada', { alias: shortId });
-      } catch (error) {
-        console.error("Error:", error);
-        alert("Error al acortar. Intenta nuevamente.");
-      }
-    });
-
-    copyBtn.addEventListener("click", () => {
-      navigator.clipboard.writeText(shortUrlLink.textContent)
-        .then(() => alert("¡Enlace copiado! 📋"))
-        .catch(() => alert("Error al copiar"));
-    });
-
-    function generateShortId() {
-      return Math.random().toString(36).substring(2, 8);
+      document.getElementById('result').innerHTML = `URL corta: <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
     }
   </script>
 </body>
