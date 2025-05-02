@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/r/:alias"
+  to = "/redirect.html?alias=:alias"
+  status = 200
+
