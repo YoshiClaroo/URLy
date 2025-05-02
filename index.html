@@ -32,6 +32,25 @@
       margin-top: 20px;
       font-weight: bold;
     }
+    .url-item {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: #f0f4f8;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+    }
+    .url-item a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+    .url-item .copy-btn {
+      background-color: #34d399;
+    }
+    .url-item .copy-btn:hover {
+      background-color: #10b981;
+    }
   </style>
 </head>
 <body>
@@ -39,10 +58,12 @@
   <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí">
   <button onclick="shortenUrl()">Acortar</button>
   <div id="result"></div>
+  <h2>Mis URLs Acortadas</h2>
+  <div id="urlsList"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -81,7 +102,41 @@
       });
 
       document.getElementById('result').innerHTML = `URL corta: <a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+      fetchUrls();
     }
+
+    async function fetchUrls() {
+      const querySnapshot = await getDocs(collection(db, "urls"));
+      const urlsList = document.getElementById('urlsList');
+      urlsList.innerHTML = ''; // Limpiar la lista actual
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const urlItem = document.createElement('div');
+        urlItem.classList.add('url-item');
+
+        const creationDate = new Date(data.createdAt.seconds * 1000).toLocaleString();
+        const clicks = data.clicks;
+
+        urlItem.innerHTML = `
+          <p>URL: <a href="${window.location.origin}/${data.shortId}" target="_blank">${window.location.origin}/${data.shortId}</a></p>
+          <p>Fecha de creación: ${creationDate}</p>
+          <p>Vistas: ${clicks}</p>
+          <button class="copy-btn" onclick="copyUrl('${window.location.origin}/${data.shortId}')">Copiar URL</button>
+        `;
+
+        urlsList.appendChild(urlItem);
+      });
+    }
+
+    function copyUrl(url) {
+      navigator.clipboard.writeText(url)
+        .then(() => alert("URL copiada al portapapeles"))
+        .catch((err) => alert("Error al copiar la URL: " + err));
+    }
+
+    // Cargar las URLs desde Firebase al cargar la página
+    window.onload = fetchUrls;
   </script>
 </body>
 </html>
