@@ -1,24 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Redirigiendo...</title>
   <style>
     body {
-      background: #ffffff;
-      color: #1d4ed8;
       font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       min-height: 100vh;
-      text-align: center;
+      color: #4361ee;
     }
+    .loader {
+      border: 5px solid #e2e8f0;
+      border-top: 5px solid #4361ee;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    p { margin-top: 20px; }
   </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, where, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -33,23 +46,22 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const shortId = window.location.pathname.substring(1);
+    const alias = window.location.pathname.split("/").pop();
+    const docRef = doc(db, "urls", alias);
 
-    const q = query(collection(db, "urls"), where("shortId", "==", shortId));
-    const snap = await getDocs(q);
-
-    if (!snap.empty) {
-      const docRef = snap.docs[0].ref;
-      const data = snap.docs[0].data();
-
-      await updateDoc(docRef, { clicks: increment(1) });
-      window.location.href = data.longUrl;
-    } else {
-      document.body.innerHTML = "<h2>URL no encontrada</h2>";
-    }
+    getDoc(docRef).then(async (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        await updateDoc(docRef, { clicks: increment(1) });
+        window.location.href = data.longUrl;
+      } else {
+        document.body.innerHTML = "<h2>Enlace no encontrado</h2>";
+      }
+    });
   </script>
 </head>
 <body>
-  <h2>Redirigiendo...</h2>
+  <div class="loader"></div>
+  <p>Redirigiendo...</p>
 </body>
 </html>
