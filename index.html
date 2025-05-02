@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URLy - Acortador de URLs</title>
+    <title>URLy ✨ - Acortador de URLs</title>
     <style>
+        /* Tus estilos CSS aquí (igual que antes) */
         body {
             font-family: 'Arial', sans-serif;
             background: #f0f4f8;
@@ -25,66 +26,8 @@
             max-width: 500px;
             text-align: center;
         }
-        h1 {
-            color: #4361ee;
-            margin-bottom: 1rem;
-        }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        input {
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-        button {
-            padding: 12px;
-            background: #4361ee;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        button:hover {
-            background: #3a56d4;
-        }
-        #result {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 8px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            display: none;
-        }
-        #shortUrl {
-            color: #4361ee;
-            text-decoration: none;
-            font-weight: bold;
-            word-break: break-all;
-        }
-        .stats {
-            margin-top: 15px;
-            text-align: left;
-            font-size: 14px;
-            color: #64748b;
-        }
-        .copy-btn {
-            background: #4CAF50;
-            margin-top: 10px;
-        }
-        .copy-btn:hover {
-            background: #45a049;
-        }
+        /* ... (conserva el resto de tus estilos) ... */
     </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
@@ -108,21 +51,27 @@
         </div>
     </div>
 
-    <!-- Script incrustado -->
-    <script>
-        // Config Firebase (¡Reemplaza con tus datos!)
+    <!-- Firebase SDKs MODULARES (v11.6.1) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+
+        // Tu configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+            authDomain: "urlyi-b3947.firebaseapp.com",
+            projectId: "urlyi-b3947",
+            storageBucket: "urlyi-b3947.appspot.com",
+            messagingSenderId: "732077984332",
+            appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+            measurementId: "G-VPHWGQG61Q"
         };
 
         // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const analytics = getAnalytics(app);
 
         // DOM Elements
         const urlInput = document.getElementById("urlInput");
@@ -149,9 +98,9 @@
                 const shortUrl = `${window.location.origin}/${shortId}`;
 
                 // Guardar en Firestore
-                await db.collection("urls").doc(shortId).set({
+                await setDoc(doc(db, "urls", shortId), {
                     longUrl: longUrl,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: serverTimestamp(),
                     clicks: 0
                 });
 
@@ -165,6 +114,9 @@
                 // Limpiar campos
                 urlInput.value = "";
                 aliasInput.value = "";
+
+                // Evento de Analytics
+                logEvent(analytics, 'url_acortada', { alias: shortId });
             } catch (error) {
                 console.error("Error:", error);
                 alert("Error al acortar. Intenta nuevamente.");
