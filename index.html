@@ -3,57 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>URLy - Acortador de Enlaces</title>
+  <title>Acortador de URL | URLy</title>
   <style>
     body {
-      margin: 0;
-      padding: 0;
+      background-color: white;
       font-family: Arial, sans-serif;
-      background: #ffffff;
+      color: #1e40af;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       flex-direction: column;
-      color: #4361ee;
+      align-items: center;
+      padding: 2rem;
     }
+
     h1 {
-      font-size: 2rem;
+      margin-bottom: 1rem;
     }
+
     input, button {
-      margin: 8px 0;
       padding: 10px;
-      border: 1px solid #4361ee;
+      margin: 0.5rem;
+      font-size: 1rem;
       border-radius: 5px;
-      width: 300px;
+      border: 1px solid #ccc;
     }
+
     button {
-      background-color: #4361ee;
+      background-color: #1e40af;
       color: white;
       cursor: pointer;
     }
-    .url-info {
-      margin-top: 20px;
-      text-align: center;
+
+    #shortUrl {
+      margin-top: 1rem;
+      font-weight: bold;
     }
-    .copy-btn {
-      margin-top: 10px;
-      background: #f1f1f1;
-      color: #4361ee;
-      border: 1px dashed #4361ee;
+
+    #urlList {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .url-block {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+
+    .url-block a {
+      color: #1e40af;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
-  <h1>URLy</h1>
-  <input type="text" id="longUrl" placeholder="Pega tu enlace largo aquí" />
+  <h1>Acortador de URL</h1>
+
+  <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí" />
   <input type="text" id="alias" placeholder="Alias personalizado (opcional)" />
-  <button id="shortenBtn">Acortar URL</button>
-  <div class="url-info" id="result"></div>
+  <button id="shortenBtn">Acortar</button>
+
+  <div id="shortUrl"></div>
+  <div id="urlList"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, getDocs, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -70,32 +87,67 @@
 
     document.getElementById("shortenBtn").addEventListener("click", async () => {
       const longUrl = document.getElementById("longUrl").value.trim();
-      const alias = document.getElementById("alias").value.trim() || Math.random().toString(36).substring(2, 8);
+      const alias = document.getElementById("alias").value.trim();
 
-      if (!longUrl) return alert("Por favor, pega una URL.");
-
-      const docRef = doc(db, "urls", alias);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        alert("Este alias ya está en uso.");
+      if (!longUrl) {
+        alert("Por favor ingresa una URL.");
         return;
       }
 
-      await setDoc(docRef, {
+      const shortId = alias || Math.random().toString(36).substring(2, 8);
+      const ref = doc(db, "urls", shortId);
+      const docSnap = await getDoc(ref);
+
+      if (docSnap.exists()) {
+        alert("Ese alias ya está en uso.");
+        return;
+      }
+
+      await setDoc(ref, {
         longUrl,
-        alias,
         clicks: 0,
         createdAt: serverTimestamp()
       });
 
-      const shortUrl = `${window.location.origin}/r/${alias}`;
-      document.getElementById("result").innerHTML = `
-        <p><strong>URL corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-        <button class="copy-btn" onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
-        <p><strong>Alias:</strong> ${alias}</p>
+      const shortUrl = `${window.location.origin}/r/${shortId}`;
+      document.getElementById("shortUrl").innerHTML = `
+        <p>URL acortada: <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+        <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
       `;
+
+      document.getElementById("longUrl").value = "";
+      document.getElementById("alias").value = "";
+
+      mostrarURLs();
     });
+
+    async function mostrarURLs() {
+      const contenedor = document.getElementById("urlList");
+      contenedor.innerHTML = "";
+
+      const q = query(collection(db, "urls"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
+
+      querySnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const shortUrl = `${window.location.origin}/r/${docSnap.id}`;
+        const longUrl = data.longUrl;
+        const clicks = data.clicks ?? 0;
+        const fecha = data.createdAt?.toDate().toLocaleString() ?? "Sin fecha";
+
+        const block = document.createElement("div");
+        block.classList.add("url-block");
+        block.innerHTML = `
+          <p><strong>URL corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+          <p><strong>Original:</strong> ${longUrl}</p>
+          <p><strong>Clics:</strong> ${clicks}</p>
+          <p><strong>Fecha:</strong> ${fecha}</p>
+        `;
+        contenedor.appendChild(block);
+      });
+    }
+
+    window.addEventListener("load", mostrarURLs);
   </script>
 </body>
 </html>
