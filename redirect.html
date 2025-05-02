@@ -35,31 +35,45 @@
             font-weight: bold;
         }
     </style>
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Configuración Firebase -->
-    <script src="/firebase.js"></script>
-</head>
-<body>
-    <div class="loader"></div>
-    <div class="loading-text">Cargando</div>
+    <!-- Firebase SDKs MODULARES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+            authDomain: "urlyi-b3947.firebaseapp.com",
+            projectId: "urlyi-b3947",
+            storageBucket: "urlyi-b3947.appspot.com",
+            messagingSenderId: "732077984332",
+            appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+            measurementId: "G-VPHWGQG61Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         // Obtener ID de la URL (ej: /abc123)
         const shortId = window.location.pathname.substring(1);
 
         // Buscar en Firestore y redirigir
-        db.collection("urls").doc(shortId).get().then((doc) => {
-            if (doc.exists) {
-                window.location.href = doc.data().longUrl; // Redirección inmediata
-                db.collection("urls").doc(shortId).update({
-                    clicks: firebase.firestore.FieldValue.increment(1)
+        getDoc(doc(db, "urls", shortId)).then((docSnap) => {
+            if (docSnap.exists()) {
+                const urlData = docSnap.data();
+                // Redirigir inmediatamente
+                window.location.href = urlData.longUrl;
+                // Actualizar contador de clics
+                updateDoc(doc(db, "urls", shortId), {
+                    clicks: increment(1)
                 });
             } else {
                 window.location.href = "/"; // Si no existe, va al inicio
             }
         });
     </script>
+</head>
+<body>
+    <div class="loader"></div>
+    <div class="loading-text">Cargando</div>
 </body>
 </html>
