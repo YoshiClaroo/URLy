@@ -1,79 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirigiendo | URLy</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #f0f4f8;
-            flex-direction: column;
-            font-family: 'Arial', sans-serif;
-        }
-        .loader {
-            border: 5px solid #e2e8f0;
-            border-top: 5px solid #4361ee;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .loading-text {
-            color: #4361ee;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-    </style>
-    <!-- Firebase SDKs MODULARES -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <meta charset="UTF-8">
+  <title>Redirigiendo...</title>
+  <style>
+    body {
+      background: #ffffff;
+      color: #1d4ed8;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      min-height: 100vh;
+      text-align: center;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, updateDoc, doc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-            authDomain: "urlyi-b3947.firebaseapp.com",
-            projectId: "urlyi-b3947",
-            storageBucket: "urlyi-b3947.appspot.com",
-            messagingSenderId: "732077984332",
-            appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-            measurementId: "G-VPHWGQG61Q"
-        };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+      authDomain: "urlyi-b3947.firebaseapp.com",
+      projectId: "urlyi-b3947",
+      storageBucket: "urlyi-b3947.appspot.com",
+      messagingSenderId: "732077984332",
+      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+      measurementId: "G-VPHWGQG61Q"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Obtener ID de la URL (ej: /abc123)
-        const shortId = window.location.pathname.substring(1);
+    const shortId = window.location.pathname.substring(1);
 
-        // Buscar en Firestore y redirigir
-        getDoc(doc(db, "urls", shortId)).then((docSnap) => {
-            if (docSnap.exists()) {
-                const urlData = docSnap.data();
-                // Redirigir inmediatamente
-                window.location.href = urlData.longUrl;
-                // Actualizar contador de clics
-                updateDoc(doc(db, "urls", shortId), {
-                    clicks: increment(1)
-                });
-            } else {
-                window.location.href = "/"; // Si no existe, va al inicio
-            }
-        });
-    </script>
+    const q = query(collection(db, "urls"), where("shortId", "==", shortId));
+    const snap = await getDocs(q);
+
+    if (!snap.empty) {
+      const docRef = snap.docs[0].ref;
+      const data = snap.docs[0].data();
+
+      await updateDoc(docRef, { clicks: increment(1) });
+      window.location.href = data.longUrl;
+    } else {
+      document.body.innerHTML = "<h2>URL no encontrada</h2>";
+    }
+  </script>
 </head>
 <body>
-    <div class="loader"></div>
-    <div class="loading-text">Cargando</div>
+  <h2>Redirigiendo...</h2>
 </body>
 </html>
