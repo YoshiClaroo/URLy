@@ -55,6 +55,7 @@
 </head>
 <body>
   <h1>Acortador de URLs</h1>
+  <input type="text" id="alias" placeholder="Introduce tu alias">
   <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí">
   <button onclick="shortenUrl()">Acortar</button>
   <div id="result"></div>
@@ -88,15 +89,18 @@
     }
 
     async function shortenUrl() {
+      const alias = document.getElementById('alias').value.trim();
       const longUrl = document.getElementById('longUrl').value.trim();
-      if (!longUrl) return;
+      if (!longUrl || !alias) return;
 
       const shortId = generateShortId();
       const shortUrl = `${window.location.origin}/${shortId}`;
 
+      // Guardar en Firestore
       await addDoc(collection(db, "urls"), {
         shortId,
         longUrl,
+        alias,
         clicks: 0,
         createdAt: serverTimestamp()
       });
@@ -119,6 +123,7 @@
         const clicks = data.clicks;
 
         urlItem.innerHTML = `
+          <p>Alias: ${data.alias}</p>
           <p>URL: <a href="${window.location.origin}/${data.shortId}" target="_blank">${window.location.origin}/${data.shortId}</a></p>
           <p>Fecha de creación: ${creationDate}</p>
           <p>Vistas: ${clicks}</p>
