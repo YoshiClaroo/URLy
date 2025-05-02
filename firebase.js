@@ -1,19 +1,18 @@
-// Configuración de Firebase (¡REEMPLAZA CON TUS DATOS!)
+// firebase.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+  authDomain: "urlyi-b3947.firebaseapp.com",
+  projectId: "urlyi-b3947",
+  storageBucket: "urlyi-b3947.appspot.com",
+  messagingSenderId: "732077984332",
+  appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+  measurementId: "G-VPHWGQG61Q"
 };
 
-// Inicializar Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-// Opcional: Habilitar persistencia offline (útil para PWAs)
-firebase.firestore().enablePersistence()
-  .catch((err) => {
-      console.log("Error al activar persistencia: ", err);
-  });
+export { db };
