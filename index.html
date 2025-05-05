@@ -1,68 +1,61 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-adsense-account" content="ca-pub-3539363562189833">
-  <script type="text/javascript" async src="https://cdn.resources.wortise.com/sdk/web/web-sdk.js">
-    wortise.init('your asset key')
-  </script>
-  <meta name="galaksion-domain-verification" content="100a8563b92af27d88862efd5c08f0c6217a58c90332969dffb576027076563b" />
   <title>Acortador de URL | URLy</title>
   <style>
     body {
-      background-color: white;
       font-family: Arial, sans-serif;
+      background: white;
       color: #1e40af;
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
     }
-
     h1 {
-      margin-bottom: 1rem;
+      text-align: center;
     }
-
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 500px;
+    }
     input, button {
-      padding: 10px;
-      margin: 0.5rem;
-      font-size: 1rem;
-      border-radius: 5px;
+      padding: 12px;
+      margin: 8px 0;
+      border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 16px;
     }
-
     button {
-      background-color: #1e40af;
+      background: #1e40af;
       color: white;
       cursor: pointer;
+      border: none;
     }
-
     #shortUrl {
-      margin-top: 1rem;
-      font-weight: bold;
+      margin: 20px 0;
+      text-align: center;
     }
-
-    #urlList {
-      margin-top: 2rem;
-      width: 100%;
-      max-width: 600px;
-    }
-
-    .url-block {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 15px;
-      background-color: #f9f9f9;
-    }
-
-    .url-block a {
-      color: #1e40af;
+    .view-all-btn {
+      display: inline-block;
+      background: #1e40af;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
       text-decoration: none;
+      margin-top: 20px;
     }
-
-    /* Nuevos estilos agregados */
+    .faq {
+      margin-top: 40px;
+      text-align: left;
+    }
     #cookie-banner {
       position: fixed;
       bottom: 0;
@@ -70,99 +63,45 @@
       right: 0;
       background: #1e40af;
       color: white;
-      padding: 1rem;
+      padding: 16px;
       text-align: center;
       z-index: 1000;
-      display: none;
-    }
-
-    #cookie-banner button {
-      margin-left: 1rem;
-      background: white;
-      color: #1e40af;
-      border: none;
-      padding: 5px 15px;
-    }
-
-    footer {
-      margin-top: 3rem;
-      text-align: center;
-      padding: 1rem;
-    }
-
-    .faq {
-      max-width: 600px;
-      margin: 2rem auto;
-      text-align: left;
-    }
-
-    /* Estilo para el nuevo botón */
-    .view-all-btn {
-      background-color: #1e40af;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      margin-top: 1rem;
-      display: inline-block;
     }
   </style>
 </head>
 <body>
   <h1>Acortador de URL</h1>
-
-  <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí" />
-  <input type="text" id="alias" placeholder="Alias personalizado (opcional)" />
-  <button id="shortenBtn">Acortar</button>
-  <!-- Contenedor principal del banner -->
-  <div class="banner-container">
-    <!-- Banner de A-Ads (300x250) -->
+  
+  <div class="input-group">
+    <input type="text" id="longUrl" placeholder="Pega tu URL larga aquí">
+    <input type="text" id="alias" placeholder="Alias personalizado (opcional)">
+    <button id="shortenBtn">Acortar URL</button>
   </div>
 
   <div id="shortUrl"></div>
-  <div id="urlList"></div>
+  
+  <a href="urls.html" class="view-all-btn">Ver todas las URLs acortadas</a>
 
-  <!-- Nuevo botón para ver todas las URLs -->
-  <a href="/urls.html" class="view-all-btn">Ver todas las URLs acortadas</a>
-
-  <!-- Sección FAQ agregada -->
   <div class="faq">
     <h2>Preguntas Frecuentes</h2>
-    <p><strong>¿Es gratis?</strong> Sí, nuestro acortador es 100% gratuito.</p>
-    <p><strong>¿Cómo uso mi alias?</strong> Ingresa un texto único en el campo "Alias".</p>
-    <p><strong>¿Dónde veo mis URLs?</strong> Todas se muestran abajo automáticamente.</p>
+    <p><strong>¿Es gratis?</strong> Sí, nuestro servicio es 100% gratuito.</p>
+    <p><strong>¿Se guardan mis URLs?</strong> Sí, puedes consultarlas cuando quieras.</p>
   </div>
 
-  <!-- Footer con enlaces legales -->
   <footer>
-    <a href="/terminos">Términos</a> | 
-    <a href="/privacidad">Privacidad</a>
+    <a href="terminos.html">Términos</a> | 
+    <a href="privacidad.html">Privacidad</a>
   </footer>
 
-  <!-- Banner de Cookies (versión corregida) -->
   <div id="cookie-banner">
-    Usamos cookies para analizar tráfico y personalizar anuncios. 
-    <a href="/privacidad#cookies" style="color: #a7c3ff;">Más información</a>.
-    <button onclick="acceptCookies()" id="cookie-accept">Aceptar</button>
+    Usamos cookies para mejorar tu experiencia. 
+    <a href="privacidad.html#cookies" style="color: #a7c3ff;">Más información</a>.
+    <button onclick="acceptCookies()">Aceptar</button>
   </div>
-
-  <script>
-    // Mostrar banner solo si no ha sido aceptado
-    if (!localStorage.getItem('cookies-accepted')) {
-      document.getElementById('cookie-banner').style.display = 'block';
-    }
-
-    // Función para aceptar cookies
-    function acceptCookies() {
-      localStorage.setItem('cookies-accepted', 'true');
-      document.getElementById('cookie-banner').style.removeProperty('display');
-      console.log("Cookies aceptadas");
-    }
-  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, orderBy, getDocs, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
@@ -177,21 +116,31 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Cookies
+    if (!localStorage.getItem('cookies-accepted')) {
+      document.getElementById('cookie-banner').style.display = 'block';
+    }
+
+    window.acceptCookies = () => {
+      localStorage.setItem('cookies-accepted', 'true');
+      document.getElementById('cookie-banner').style.display = 'none';
+    };
+
+    // Acortador
     document.getElementById("shortenBtn").addEventListener("click", async () => {
       const longUrl = document.getElementById("longUrl").value.trim();
       const alias = document.getElementById("alias").value.trim();
 
       if (!longUrl) {
-        alert("Por favor ingresa una URL.");
+        alert("Por favor ingresa una URL válida");
         return;
       }
 
       const shortId = alias || Math.random().toString(36).substring(2, 8);
       const ref = doc(db, "urls", shortId);
-      const docSnap = await getDoc(ref);
 
-      if (docSnap.exists()) {
-        alert("Ese alias ya está en uso.");
+      if ((await getDoc(ref)).exists()) {
+        alert("¡Este alias ya está en uso!");
         return;
       }
 
@@ -203,43 +152,13 @@
 
       const shortUrl = `${window.location.origin}/r/${shortId}`;
       document.getElementById("shortUrl").innerHTML = `
-        <p>URL acortada: <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-        <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
+        <p>Tu URL acortada:</p>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <a href="${shortUrl}" target="_blank" style="color:#1e40af">${shortUrl}</a>
+          <button onclick="navigator.clipboard.writeText('${shortUrl}')">📋</button>
+        </div>
       `;
-
-      document.getElementById("longUrl").value = "";
-      document.getElementById("alias").value = "";
-
-      mostrarURLs();
     });
-
-    async function mostrarURLs() {
-      const contenedor = document.getElementById("urlList");
-      contenedor.innerHTML = "";
-
-      const q = query(collection(db, "urls"), orderBy("createdAt", "desc"));
-      const querySnapshot = await getDocs(q);
-
-      querySnapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const shortUrl = `${window.location.origin}/r/${docSnap.id}`;
-        const longUrl = data.longUrl;
-        const clicks = data.clicks ?? 0;
-        const fecha = data.createdAt?.toDate().toLocaleString() ?? "Sin fecha";
-
-        const block = document.createElement("div");
-        block.classList.add("url-block");
-        block.innerHTML = `
-          <p><strong>URL corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-          <p><strong>Original:</strong> ${longUrl}</p>
-          <p><strong>Clics:</strong> ${clicks}</p>
-          <p><strong>Fecha:</strong> ${fecha}</p>
-        `;
-        contenedor.appendChild(block);
-      });
-    }
-
-    window.addEventListener("load", mostrarURLs);
   </script>
 </body>
 </html>
