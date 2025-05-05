@@ -70,21 +70,25 @@
     const db = getFirestore(app);
     const urlId = window.location.pathname.split('/').pop();
 
-    // Configuración Cuty.io (API Quick)
-    const CUTY_API_TOKEN = "4a0e9adeffd70ff5cd9126c3b"; // Tu API Token
+    // Configuración Cuty.io
+    const CUTY_API_TOKEN = "4a0e9adeffd70ff5cd9126c3b";
 
     async function getCutyShortUrl(longUrl) {
       try {
-        const response = await fetch(
-          `https://api.cuty.io/quick?token=${CUTY_API_TOKEN}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`
-        );
+        // Usamos formato text para respuesta más simple
+        const apiUrl = `https://api.cuty.io/quick?token=${CUTY_API_TOKEN}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`;
         
-        if (!response.ok) throw new Error("Error en la API");
+        const response = await fetch(apiUrl);
         
-        return await response.text(); // Devuelve directamente la URL corta
+        if (!response.ok) {
+          throw new Error(await response.text());
+        }
+        
+        return await response.text();
       } catch (error) {
         console.error("Error con Cuty.io:", error);
-        return longUrl; // Si falla, usa la URL original
+        // Si falla, usamos la URL original como respaldo
+        return longUrl;
       }
     }
 
@@ -94,31 +98,35 @@
         const urlDoc = await getDoc(urlRef);
 
         if (urlDoc.exists()) {
+          // 1. Registra el click en Firebase
           await updateDoc(urlRef, { clicks: increment(1) });
           
+          // 2. Obtiene URL de Cuty.io
           const cutyUrl = await getCutyShortUrl(urlDoc.data().longUrl);
           
-          // Redirige después de 2 segundos (para que el usuario vea el spinner)
+          // 3. Muestra botón de redirección manual
+          const manualBtn = document.getElementById('manualRedirect');
+          manualBtn.href = cutyUrl;
+          manualBtn.style.display = 'inline-block';
+          
+          // 4. Redirige automáticamente después de 1.5 segundos
           setTimeout(() => {
             window.location.href = cutyUrl;
-          }, 2000);
-
-          // Muestra botón de redirección manual como respaldo
-          document.getElementById('manualRedirect').href = cutyUrl;
-          document.getElementById('manualRedirect').style.display = 'inline-block';
+          }, 1500);
         } else {
           showError("Enlace no encontrado");
         }
       } catch (error) {
         showError("Error al redirigir: " + error.message);
-        console.error("Detalles:", error);
+        console.error("Error crítico:", error);
       }
     }
 
     function showError(message) {
       document.querySelector('.loader').style.display = 'none';
-      document.getElementById('error').textContent = message;
-      document.getElementById('error').style.display = 'block';
+      const errorEl = document.getElementById('error');
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
     }
 
     // Iniciar redirección
