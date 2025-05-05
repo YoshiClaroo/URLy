@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-adsense-account" content="ca-pub-3539363562189833">
-  <title>Redirigiendo... | URLy</title>
+  <title>Redireccionando... | URLy</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: white;
+      background: white;
       color: #1e40af;
       display: flex;
       flex-direction: column;
@@ -33,43 +32,20 @@
     }
     .error {
       color: #dc2626;
-      margin: 20px 0;
-    }
-    .banner-container {
-      width: 100%;
-      max-width: 728px;
-      margin: 20px auto;
+      margin-top: 20px;
     }
   </style>
-
-  <!-- Scripts de anuncios (mantenidos igual) -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3539363562189833" crossorigin="anonymous"></script>
-  <script src="https://ligheechoagool.com/88/tag.min.js" data-zone="145605" async data-cfasync="false"></script>
 </head>
 <body>
-  <!-- Banner superior -->
-  <div class="banner-container">
-    <script type="text/javascript" src="//www.highperformanceformat.com/2adda26dee103dc34c9d168ed8534f75/invoke.js"></script>
-    <script type='text/javascript' src='https://www.your-banner-code-1.js'></script>
-  </div>
-
-  <!-- Contenido principal -->
   <div class="loader"></div>
   <p>Redirigiendo...</p>
   <p id="error" class="error" style="display: none;"></p>
-
-  <!-- Banner inferior -->
-  <div class="banner-container">
-    <script async="async" data-cfasync="false" src="//pl26540266.profitableratecpm.com/a89ccb1c4806b9ebe69e94dd89d8a503/invoke.js"></script>
-    <div id="container-a89ccb1c4806b9ebe69e94dd89d8a503"></div>
-    <script type='text/javascript' src='https://www.your-banner-code-1.js'></script> 
-  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Configuración Firebase (igual que en index.html)
+    // Configuración Firebase (tu código actual)
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
       authDomain: "urlyi-b3947.firebaseapp.com",
@@ -82,28 +58,42 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const urlId = window.location.pathname.split('/').pop();
 
-    // Obtener ID de la URL
-    const alias = window.location.pathname.split("/").pop();
-    const docRef = doc(db, "urls", alias);
+    // Configuración Cuty.io (¡USANDO TUS DATOS!)
+    const CUTY_API_KEY = "9f3d5911ed1c9fc0ae744c6d11eedc75ade397a9"; // Tu API Key
+    const CUTY_USER_ID = "TU_USER_ID"; // Ejemplo: "12345" (obténlo de la URL de tu panel Cuty)
 
-    // Manejo de redirección
-    getDoc(docRef).then(async (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        await updateDoc(docRef, { clicks: increment(1) });
-        window.location.href = data.longUrl;
-      } else {
-        document.getElementById('error').textContent = "Enlace no encontrado o expirado";
-        document.getElementById('error').style.display = "block";
-        document.querySelector('.loader').style.display = "none";
+    async function redirect() {
+      try {
+        const urlRef = doc(db, "urls", urlId);
+        const urlDoc = await getDoc(urlRef);
+
+        if (urlDoc.exists()) {
+          // 1. Registra el click en Firebase
+          await updateDoc(urlRef, { clicks: increment(1) });
+          
+          // 2. Redirige a Cuty.io con parámetros personalizados
+          const longUrl = encodeURIComponent(urlDoc.data().longUrl);
+          const customAlias = urlId; // Usa el ID de Firebase como alias
+          
+          window.location.href = `https://cuty.io/api?api=${CUTY_API_KEY}&url=${longUrl}&user=${CUTY_USER_ID}&alias=${customAlias}&type=interstitial`;
+        } else {
+          showError("Enlace no encontrado");
+        }
+      } catch (error) {
+        showError("Error al redirigir");
+        console.error("Detalles:", error);
       }
-    }).catch(error => {
-      document.getElementById('error').textContent = "Error al cargar el enlace";
-      document.getElementById('error').style.display = "block";
-      document.querySelector('.loader').style.display = "none";
-      console.error("Error:", error);
-    });
+    }
+
+    function showError(message) {
+      document.querySelector('.loader').style.display = 'none';
+      document.getElementById('error').textContent = message;
+      document.getElementById('error').style.display = 'block';
+    }
+
+    redirect();
   </script>
 </body>
 </html>
