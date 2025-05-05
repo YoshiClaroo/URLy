@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URLs Acortadas | URLy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: white;
+      color: #1e40af;
+      margin: 0;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    #urlList {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .url-block {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background-color: #f9f9f9;
+    }
+    .url-block a {
+      color: #1e40af;
+      text-decoration: none;
+    }
+    .back-btn {
+      display: block;
+      text-align: center;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>URLs Acortadas</h1>
+  <div id="urlList"></div>
+  <a href="/" class="back-btn">← Volver al acortador</a>
+
+  <!-- Firebase y Script de Carga -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+      authDomain: "urlyi-b3947.firebaseapp.com",
+      projectId: "urlyi-b3947",
+      storageBucket: "urlyi-b3947.appspot.com",
+      messagingSenderId: "732077984332",
+      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+      measurementId: "G-VPHWGQG61Q"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadURLs() {
+      const urlList = document.getElementById('urlList');
+      urlList.innerHTML = '<p>Cargando URLs...</p>';
+
+      try {
+        const q = query(collection(db, "urls"), orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          urlList.innerHTML = '<p>No hay URLs acortadas aún.</p>';
+          return;
+        }
+
+        urlList.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const block = document.createElement('div');
+          block.className = 'url-block';
+          block.innerHTML = `
+            <p><strong>URL Corta:</strong> <a href="/r/${doc.id}" target="_blank">${window.location.origin}/r/${doc.id}</a></p>
+            <p><strong>Original:</strong> <a href="${data.longUrl}" target="_blank">${data.longUrl}</a></p>
+            <p><strong>Clics:</strong> ${data.clicks || 0}</p>
+            <p><strong>Fecha:</strong> ${data.createdAt?.toDate().toLocaleString() || 'No registrada'}</p>
+          `;
+          urlList.appendChild(block);
+        });
+      } catch (error) {
+        urlList.innerHTML = `<p>Error al cargar URLs: ${error.message}</p>`;
+      }
+    }
+
+    window.addEventListener('load', loadURLs);
+  </script>
+</body>
+</html>
