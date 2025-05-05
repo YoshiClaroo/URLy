@@ -1,46 +1,75 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />	
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google-adsense-account" content="ca-pub-3539363562189833">
-  <title>Redirigiendo...</title>
+  <title>Redirigiendo... | URLy</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f0f4f8;
+      background-color: white;
+      color: #1e40af;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      color: #4361ee;
+      margin: 0;
+      text-align: center;
     }
     .loader {
-      border: 5px solid #e2e8f0;
-      border-top: 5px solid #4361ee;
+      border: 5px solid rgba(30, 64, 175, 0.2);
+      border-top: 5px solid #1e40af;
       border-radius: 50%;
       width: 50px;
       height: 50px;
       animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    p { margin-top: 20px; }
+    .error {
+      color: #dc2626;
+      margin: 20px 0;
+    }
+    .banner-container {
+      width: 100%;
+      max-width: 728px;
+      margin: 20px auto;
+    }
   </style>
 
-   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3539363562189833"
-     crossorigin="anonymous"></script>
-	
-  <!-- Barra Social AdsTerra -->
+  <!-- Scripts de anuncios (mantenidos igual) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3539363562189833" crossorigin="anonymous"></script>
   <script src="https://ligheechoagool.com/88/tag.min.js" data-zone="145605" async data-cfasync="false"></script>
-	
+</head>
+<body>
+  <!-- Banner superior -->
+  <div class="banner-container">
+    <script type="text/javascript" src="//www.highperformanceformat.com/2adda26dee103dc34c9d168ed8534f75/invoke.js"></script>
+    <script type='text/javascript' src='https://www.your-banner-code-1.js'></script>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="loader"></div>
+  <p>Redirigiendo...</p>
+  <p id="error" class="error" style="display: none;"></p>
+
+  <!-- Banner inferior -->
+  <div class="banner-container">
+    <script async="async" data-cfasync="false" src="//pl26540266.profitableratecpm.com/a89ccb1c4806b9ebe69e94dd89d8a503/invoke.js"></script>
+    <div id="container-a89ccb1c4806b9ebe69e94dd89d8a503"></div>
+    <script type='text/javascript' src='https://www.your-banner-code-1.js'></script> 
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Configuración Firebase (igual que en index.html)
     const firebaseConfig = {
       apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
       authDomain: "urlyi-b3947.firebaseapp.com",
@@ -54,34 +83,27 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // Obtener ID de la URL
     const alias = window.location.pathname.split("/").pop();
     const docRef = doc(db, "urls", alias);
 
+    // Manejo de redirección
     getDoc(docRef).then(async (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         await updateDoc(docRef, { clicks: increment(1) });
         window.location.href = data.longUrl;
       } else {
-        document.body.innerHTML = "<h2>Enlace no encontrado</h2>";
+        document.getElementById('error').textContent = "Enlace no encontrado o expirado";
+        document.getElementById('error').style.display = "block";
+        document.querySelector('.loader').style.display = "none";
       }
+    }).catch(error => {
+      document.getElementById('error').textContent = "Error al cargar el enlace";
+      document.getElementById('error').style.display = "block";
+      document.querySelector('.loader').style.display = "none";
+      console.error("Error:", error);
     });
   </script>
-</head>
-<body>
-   <!-- Banner superior -->
-    <div style="margin-bottom: 20px;">  
-      
-<script type="text/javascript" src="//www.highperformanceformat.com/2adda26dee103dc34c9d168ed8534f75/invoke.js"></script>
-        <script type='text/javascript' src='https://www.your-banner-code-1.js'></script>
-    </div>
-  <div class="loader"></div>
-  <p>Redirigiendo...</p>
-   <!-- Banner inferior -->
-    <div style="margin-bottom: 20px;">
-       <script async="async" data-cfasync="false" src="//pl26540266.profitableratecpm.com/a89ccb1c4806b9ebe69e94dd89d8a503/invoke.js"></script>
-<div id="container-a89ccb1c4806b9ebe69e94dd89d8a503"></div>
-        <script type='text/javascript' src='https://www.your-banner-code-1.js'></script> 
-    </div>
 </body>
 </html>
