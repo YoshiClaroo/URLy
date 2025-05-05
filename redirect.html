@@ -70,23 +70,30 @@
     const db = getFirestore(app);
     const urlId = window.location.pathname.split('/').pop();
 
-    // Configuración Cuty.io
-    const CUTY_API_TOKEN = "4a0e9adeffd70ff5cd9126c3b";
+    // Configuración ShrinkMe.io
+    const SHRINKME_API_KEY = "0c35c00f33efb07d85c2131175e7062d6f529b1a"; // Tu API Token
 
-    async function getCutyShortUrl(longUrl) {
+    async function getShrinkMeUrl(longUrl) {
       try {
         // Usamos formato text para respuesta más simple
-        const apiUrl = `https://api.cuty.io/quick?token=${CUTY_API_TOKEN}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`;
+        const apiUrl = `https://shrinkme.io/api?api=${SHRINKME_API_KEY}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`;
         
         const response = await fetch(apiUrl);
         
         if (!response.ok) {
-          throw new Error(await response.text());
+          throw new Error("Error en la API de ShrinkMe");
         }
         
-        return await response.text();
+        const shortUrl = await response.text();
+        
+        // Verificamos que la respuesta sea una URL válida
+        if (!shortUrl.startsWith("http")) {
+          throw new Error("Respuesta inválida de ShrinkMe");
+        }
+        
+        return shortUrl;
       } catch (error) {
-        console.error("Error con Cuty.io:", error);
+        console.error("Error con ShrinkMe.io:", error);
         // Si falla, usamos la URL original como respaldo
         return longUrl;
       }
@@ -101,17 +108,18 @@
           // 1. Registra el click en Firebase
           await updateDoc(urlRef, { clicks: increment(1) });
           
-          // 2. Obtiene URL de Cuty.io
-          const cutyUrl = await getCutyShortUrl(urlDoc.data().longUrl);
+          // 2. Obtiene URL de ShrinkMe.io
+          const shrinkUrl = await getShrinkMeUrl(urlDoc.data().longUrl);
           
           // 3. Muestra botón de redirección manual
           const manualBtn = document.getElementById('manualRedirect');
-          manualBtn.href = cutyUrl;
+          manualBtn.href = shrinkUrl;
           manualBtn.style.display = 'inline-block';
+          manualBtn.textContent = `Ir a ${new URL(shrinkUrl).hostname}`;
           
           // 4. Redirige automáticamente después de 1.5 segundos
           setTimeout(() => {
-            window.location.href = cutyUrl;
+            window.location.href = shrinkUrl;
           }, 1500);
         } else {
           showError("Enlace no encontrado");
