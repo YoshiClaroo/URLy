@@ -70,31 +70,21 @@
     const db = getFirestore(app);
     const urlId = window.location.pathname.split('/').pop();
 
-    // Configuración Cuty.io
+    // Configuración Cuty.io (API Quick)
     const CUTY_API_TOKEN = "4a0e9adeffd70ff5cd9126c3b"; // Tu API Token
 
-    async function redirectToCuty(longUrl) {
+    async function getCutyShortUrl(longUrl) {
       try {
-        const response = await fetch("https://api.cuty.io/full", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            token: CUTY_API_TOKEN,
-            url: longUrl,
-            alias: urlId
-          })
-        });
-
-        const data = await response.json();
+        const response = await fetch(
+          `https://api.cuty.io/quick?token=${CUTY_API_TOKEN}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`
+        );
         
-        if (response.status === 201) {
-          return data.data.short_url; // Devuelve la URL corta de Cuty
-        } else {
-          throw new Error(data.message || "Error en la API");
-        }
+        if (!response.ok) throw new Error("Error en la API");
+        
+        return await response.text(); // Devuelve directamente la URL corta
       } catch (error) {
         console.error("Error con Cuty.io:", error);
-        return longUrl; // Si falla, redirige directamente
+        return longUrl; // Si falla, usa la URL original
       }
     }
 
@@ -106,22 +96,22 @@
         if (urlDoc.exists()) {
           await updateDoc(urlRef, { clicks: increment(1) });
           
-          const cutyUrl = await redirectToCuty(urlDoc.data().longUrl);
+          const cutyUrl = await getCutyShortUrl(urlDoc.data().longUrl);
           
-          // Redirige después de 3 segundos (opcional)
+          // Redirige después de 2 segundos (para que el usuario vea el spinner)
           setTimeout(() => {
             window.location.href = cutyUrl;
-          }, 3000);
+          }, 2000);
 
-          // Muestra botón de redirección manual
+          // Muestra botón de redirección manual como respaldo
           document.getElementById('manualRedirect').href = cutyUrl;
           document.getElementById('manualRedirect').style.display = 'inline-block';
         } else {
           showError("Enlace no encontrado");
         }
       } catch (error) {
-        showError("Error: " + error.message);
-        console.error("Error general:", error);
+        showError("Error al redirigir: " + error.message);
+        console.error("Detalles:", error);
       }
     }
 
@@ -131,6 +121,7 @@
       document.getElementById('error').style.display = 'block';
     }
 
+    // Iniciar redirección
     redirect();
   </script>
 </body>
