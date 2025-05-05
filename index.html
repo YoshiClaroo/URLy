@@ -61,6 +61,40 @@
       color: #1e40af;
       text-decoration: none;
     }
+
+    /* Nuevos estilos agregados */
+    #cookie-banner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #1e40af;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      z-index: 1000;
+      display: none;
+    }
+
+    #cookie-banner button {
+      margin-left: 1rem;
+      background: white;
+      color: #1e40af;
+      border: none;
+      padding: 5px 15px;
+    }
+
+    footer {
+      margin-top: 3rem;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .faq {
+      max-width: 600px;
+      margin: 2rem auto;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
@@ -70,13 +104,34 @@
   <input type="text" id="alias" placeholder="Alias personalizado (opcional)" />
   <button id="shortenBtn">Acortar</button>
   <!-- Contenedor principal del banner -->
-    <div class="banner-container">
-        <!-- Banner de A-Ads (300x250) -->
-        
-    </div>
+  <div class="banner-container">
+    <!-- Banner de A-Ads (300x250) -->
+  </div>
 
   <div id="shortUrl"></div>
   <div id="urlList"></div>
+
+  <!-- Sección FAQ agregada -->
+  <div class="faq">
+    <h2>Preguntas Frecuentes</h2>
+    <p><strong>¿Es gratis?</strong> Sí, nuestro acortador es 100% gratuito.</p>
+    <p><strong>¿Cómo uso mi alias?</strong> Ingresa un texto único en el campo "Alias".</p>
+    <p><strong>¿Dónde veo mis URLs?</strong> Todas se muestran abajo automáticamente.</p>
+  </div>
+
+  <!-- Footer con enlaces legales -->
+  <footer>
+    <a href="/terminos">Términos y Condiciones</a> | 
+    <a href="/privacidad">Política de Privacidad</a> | 
+    <a href="/contacto">Contacto</a>
+  </footer>
+
+  <!-- Banner de Cookies -->
+  <div id="cookie-banner">
+    Usamos cookies para mejorar tu experiencia. 
+    <a href="/privacidad" style="color: #a7c3ff;">Más información</a>.
+    <button onclick="acceptCookies()">Aceptar</button>
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -94,6 +149,16 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // Mostrar banner de cookies si no está aceptado
+    if (!localStorage.getItem('cookies-accepted')) {
+      document.getElementById('cookie-banner').style.display = 'block';
+    }
+
+    function acceptCookies() {
+      localStorage.setItem('cookies-accepted', 'true');
+      document.getElementById('cookie-banner').style.display = 'none';
+    }
 
     document.getElementById("shortenBtn").addEventListener("click", async () => {
       const longUrl = document.getElementById("longUrl").value.trim();
