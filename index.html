@@ -95,6 +95,17 @@
       margin: 2rem auto;
       text-align: left;
     }
+
+    /* Estilo para el nuevo botón */
+    .view-all-btn {
+      background-color: #1e40af;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 1rem;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
@@ -111,6 +122,9 @@
   <div id="shortUrl"></div>
   <div id="urlList"></div>
 
+  <!-- Nuevo botón para ver todas las URLs -->
+  <a href="/urls.html" class="view-all-btn">Ver todas las URLs acortadas</a>
+
   <!-- Sección FAQ agregada -->
   <div class="faq">
     <h2>Preguntas Frecuentes</h2>
@@ -121,30 +135,29 @@
 
   <!-- Footer con enlaces legales -->
   <footer>
-  <a href="/terminos">Términos</a> | 
-  <a href="/privacidad">Privacidad</a>
+    <a href="/terminos">Términos</a> | 
+    <a href="/privacidad">Privacidad</a>
   </footer>
 
-<!-- Banner de Cookies (versión corregida) -->
-<div id="cookie-banner">
-  Usamos cookies para analizar tráfico y personalizar anuncios. 
-  <a href="/privacidad#cookies" style="color: #a7c3ff;">Más información</a>.
-  <button onclick="acceptCookies()" id="cookie-accept">Aceptar</button>
-</div>
+  <!-- Banner de Cookies (versión corregida) -->
+  <div id="cookie-banner">
+    Usamos cookies para analizar tráfico y personalizar anuncios. 
+    <a href="/privacidad#cookies" style="color: #a7c3ff;">Más información</a>.
+    <button onclick="acceptCookies()" id="cookie-accept">Aceptar</button>
+  </div>
 
-<script>
-  // Mostrar banner solo si no ha sido aceptado
-  if (!localStorage.getItem('cookies-accepted')) {
-    document.getElementById('cookie-banner').style.display = 'block';
-  }
+  <script>
+    // Mostrar banner solo si no ha sido aceptado
+    if (!localStorage.getItem('cookies-accepted')) {
+      document.getElementById('cookie-banner').style.display = 'block';
+    }
 
-  // Función para aceptar cookies
-  function acceptCookies() {
-    localStorage.setItem('cookies-accepted', 'true');
-    document.getElementById('cookie-banner').style.removeProperty('display');
-    // Opcional: Cargar scripts de terceros (como AdSense) aquí
-    console.log("Cookies aceptadas");
-  }
+    // Función para aceptar cookies
+    function acceptCookies() {
+      localStorage.setItem('cookies-accepted', 'true');
+      document.getElementById('cookie-banner').style.removeProperty('display');
+      console.log("Cookies aceptadas");
+    }
   </script>
 
   <script type="module">
@@ -163,16 +176,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    // Mostrar banner de cookies si no está aceptado
-    if (!localStorage.getItem('cookies-accepted')) {
-      document.getElementById('cookie-banner').style.display = 'block';
-    }
-
-    function acceptCookies() {
-      localStorage.setItem('cookies-accepted', 'true');
-      document.getElementById('cookie-banner').style.display = 'none';
-    }
 
     document.getElementById("shortenBtn").addEventListener("click", async () => {
       const longUrl = document.getElementById("longUrl").value.trim();
