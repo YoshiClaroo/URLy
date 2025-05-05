@@ -34,12 +34,22 @@
       color: #dc2626;
       margin-top: 20px;
     }
+    .btn {
+      background: #1e40af;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      margin-top: 15px;
+      display: inline-block;
+    }
   </style>
 </head>
 <body>
   <div class="loader"></div>
   <p>Redirigiendo...</p>
   <p id="error" class="error" style="display: none;"></p>
+  <a id="manualRedirect" class="btn" style="display: none;" href="#">Click aquí si no redirige</a>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -63,39 +73,55 @@
     // Configuración Cuty.io
     const CUTY_API_TOKEN = "4a0e9adeffd70ff5cd9126c3b"; // Tu API Token
 
+    async function redirectToCuty(longUrl) {
+      try {
+        const response = await fetch("https://api.cuty.io/full", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: CUTY_API_TOKEN,
+            url: longUrl,
+            alias: urlId
+          })
+        });
+
+        const data = await response.json();
+        
+        if (response.status === 201) {
+          return data.data.short_url; // Devuelve la URL corta de Cuty
+        } else {
+          throw new Error(data.message || "Error en la API");
+        }
+      } catch (error) {
+        console.error("Error con Cuty.io:", error);
+        return longUrl; // Si falla, redirige directamente
+      }
+    }
+
     async function redirect() {
       try {
         const urlRef = doc(db, "urls", urlId);
         const urlDoc = await getDoc(urlRef);
 
         if (urlDoc.exists()) {
-          // 1. Registra el click en Firebase
           await updateDoc(urlRef, { clicks: increment(1) });
           
-          // 2. Redirige a través de Cuty.io (API POST)
-          const response = await fetch("https://api.cuty.io/full", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              token: CUTY_API_TOKEN,
-              url: urlDoc.data().longUrl,
-              alias: urlId // Usa el mismo ID de Firebase como alias
-            })
-          });
-
-          const data = await response.json();
+          const cutyUrl = await redirectToCuty(urlDoc.data().longUrl);
           
-          if (response.status === 201) {
-            window.location.href = data.data.short_url; // Redirige al enlace con anuncios
-          } else {
-            throw new Error("Error en la API de Cuty.io");
-          }
+          // Redirige después de 3 segundos (opcional)
+          setTimeout(() => {
+            window.location.href = cutyUrl;
+          }, 3000);
+
+          // Muestra botón de redirección manual
+          document.getElementById('manualRedirect').href = cutyUrl;
+          document.getElementById('manualRedirect').style.display = 'inline-block';
         } else {
           showError("Enlace no encontrado");
         }
       } catch (error) {
-        showError("Error al redirigir");
-        console.error("Detalles:", error);
+        showError("Error: " + error.message);
+        console.error("Error general:", error);
       }
     }
 
