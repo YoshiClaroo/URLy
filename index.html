@@ -126,12 +126,27 @@
     <a href="/contacto">Contacto</a>
   </footer>
 
-  <!-- Banner de Cookies -->
-  <div id="cookie-banner">
-    Usamos cookies para mejorar tu experiencia. 
-    <a href="/privacidad" style="color: #a7c3ff;">Más información</a>.
-    <button onclick="acceptCookies()">Aceptar</button>
-  </div>
+<!-- Banner de Cookies (versión corregida) -->
+<div id="cookie-banner">
+  Usamos cookies para analizar tráfico y personalizar anuncios. 
+  <a href="/privacidad#cookies" style="color: #a7c3ff;">Más información</a>.
+  <button onclick="acceptCookies()" id="cookie-accept">Aceptar</button>
+</div>
+
+<script>
+  // Mostrar banner solo si no ha sido aceptado
+  if (!localStorage.getItem('cookies-accepted')) {
+    document.getElementById('cookie-banner').style.display = 'block';
+  }
+
+  // Función para aceptar cookies
+  function acceptCookies() {
+    localStorage.setItem('cookies-accepted', 'true');
+    document.getElementById('cookie-banner').style.removeProperty('display');
+    // Opcional: Cargar scripts de terceros (como AdSense) aquí
+    console.log("Cookies aceptadas");
+  }
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
