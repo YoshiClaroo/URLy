@@ -504,6 +504,12 @@
     import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Redirección inmediata si no hay usuario autenticado
+    if (!auth.currentUser) {
+      console.log("No hay usuario autenticado inicialmente, redirigiendo a login.html");
+      window.location.href = 'login.html';
+    }
+
     const userAvatar = document.getElementById('userAvatar');
     const welcomeName = document.getElementById('welcomeName');
     const signOutBtn = document.getElementById('signOutBtn');
@@ -531,11 +537,13 @@
     });
 
     onAuthStateChanged(auth, (user) => {
+      console.log("onAuthStateChanged ejecutado, usuario:", user);
       if (user) {
         if (user.photoURL) userAvatar.src = user.photoURL;
         welcomeName.textContent = `Hola, ${user.displayName || user.email.split('@')[0]}`;
         loadStats(user.uid);
       } else {
+        console.log("No hay usuario autenticado, redirigiendo a login.html");
         window.location.href = 'login.html';
       }
     });
