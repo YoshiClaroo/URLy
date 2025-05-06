@@ -500,108 +500,125 @@
     </div>
   </div>
   <script type="module">
-    import { auth, db } from './js/firebase.js';
-    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    try {
+      import { auth, db } from './js/firebase.js';
+      import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+      import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Redirección inmediata si no hay usuario autenticado
-    if (!auth.currentUser) {
-      console.log("No hay usuario autenticado inicialmente, redirigiendo a login.html");
-      window.location.href = 'login.html';
-    }
+      // Bandera para evitar redirecciones múltiples
+      let isRedirecting = false;
 
-    const userAvatar = document.getElementById('userAvatar');
-    const welcomeName = document.getElementById('welcomeName');
-    const signOutBtn = document.getElementById('signOutBtn');
-    const shortenBtn = document.getElementById("shortenBtn");
-    const longUrlInput = document.getElementById("longUrl");
-    const aliasInput = document.getElementById("alias");
-    const resultContainer = document.getElementById("resultContainer");
-    const shortUrlElement = document.getElementById("shortUrl");
-    const copyBtn = document.getElementById("copyBtn");
-    const totalLinksElement = document.getElementById("totalLinks");
-    const totalVisitsElement = document.getElementById("totalVisits");
+      // Esperar a que Firebase inicialice el estado de autenticación
+      onAuthStateChanged(auth, (user) => {
+        console.log("onAuthStateChanged ejecutado en index.html, usuario:", user);
+        if (isRedirecting) return; // Evitar redirecciones múltiples
 
-    if (!localStorage.getItem('cookies-accepted')) {
-      document.getElementById('cookie-banner').style.display = 'block';
-    }
-
-    document.getElementById('acceptCookies').addEventListener('click', () => {
-      localStorage.setItem('cookies-accepted', 'true');
-      document.getElementById('cookie-banner').style.display = 'none';
-    });
-
-    document.getElementById('declineCookies').addEventListener('click', () => {
-      localStorage.setItem('cookies-accepted', 'false');
-      document.getElementById('cookie-banner').style.display = 'none';
-    });
-
-    onAuthStateChanged(auth, (user) => {
-      console.log("onAuthStateChanged ejecutado, usuario:", user);
-      if (user) {
-        if (user.photoURL) userAvatar.src = user.photoURL;
-        welcomeName.textContent = `Hola, ${user.displayName || user.email.split('@')[0]}`;
-        loadStats(user.uid);
-      } else {
-        console.log("No hay usuario autenticado, redirigiendo a login.html");
-        window.location.href = 'login.html';
-      }
-    });
-
-    signOutBtn.addEventListener('click', () => {
-      signOut(auth).then(() => {
-        window.location.href = 'login.html';
-      }).catch((error) => {
-        console.error("Error signing out:", error);
+        if (user) {
+          // Usuario autenticado, actualizar UI
+          console.log("Usuario autenticado, actualizando UI");
+          const userAvatar = document.getElementById('userAvatar');
+          const welcomeName = document.getElementById('welcomeName');
+          if (user.photoURL) userAvatar.src = user.photoURL;
+          welcomeName.textContent = `Hola, ${user.displayName || user.email.split('@')[0]}`;
+          loadStats(user.uid);
+        } else {
+          // No hay usuario, redirigir a login.html
+          console.log("No hay usuario autenticado, redirigiendo a login.html");
+          isRedirecting = true;
+          window.location.href = 'login.html';
+        }
       });
-    });
 
-    async function loadStats(userId) {
-      try {
-        const q = query(collection(db, 'urls'), where('userId', '==', userId));
-        const querySnapshot = await getDocs(q);
-        let totalClicks = 0;
-        querySnapshot.forEach(doc => {
-          totalClicks += doc.data().clicks || 0;
+      // Configurar botón de cerrar sesión
+      const signOutBtn = document.getElementById('signOutBtn');
+      signOutBtn.addEventListener('click', () => {
+        if (isRedirecting) return;
+        isRedirecting = true;
+        signOut(auth).then(() => {
+          console.log("Sesión cerrada, redirigiendo a login.html");
+          window.location.href = 'login.html';
+        }).catch((error) => {
+          console.error("Error al cerrar sesión:", error);
+          isRedirecting = false;
         });
-        totalLinksElement.textContent = querySnapshot.size;
-        totalVisitsElement.textContent = totalClicks;
-      } catch (error) {
-        console.error("Error loading stats:", error);
+      });
+
+      // Manejo de cookies
+      if (!localStorage.getItem('cookies-accepted')) {
+        document.getElementById('cookie-banner').style.display = 'block';
+      }
+      document.getElementById('acceptCookies').addEventListener('click', () => {
+        localStorage.setItem('cookies-accepted', 'true');
+        document.getElementById('cookie-banner').style.display = 'none';
+      });
+      document.getElementById('declineCookies').addEventListener('click', () => {
+        localStorage.setItem('cookies-accepted', 'false');
+        document.getElementById('cookie-banner').style.display = 'none';
+      });
+
+      // Cargar estadísticas
+      async function loadStats(userId) {
+        try {
+          const q = query(collection(db, 'urls'), where('userId', '==', userId));
+          const querySnapshot = await getDocs(q);
+          let totalClicks = 0;
+          querySnapshot.forEach(doc => {
+            totalClicks += doc.data().clicks || 0;
+          });
+          document.getElementById('totalLinks').textContent = querySnapshot.size;
+          document.getElementById('totalVisits').textContent = totalClicks;
+        } catch (error) {
+          console.error("Error al cargar estadísticas:", error);
+        }
+      }
+
+      // Acortar URL
+      const shortenBtn = document.getElementById("shortenBtn");
+      const longUrlInput = document.getElementById("longUrl");
+      const aliasInput = document.getElementById("alias");
+      const resultContainer = document.getElementById("resultContainer");
+      const shortUrlElement = document.getElementById("shortUrl");
+      const copyBtn = document.getElementById("copyBtn");
+
+      shortenBtn.addEventListener("click", async () => {
+        const longUrl = longUrlInput.value.trim();
+        const alias = aliasInput.value.trim();
+        if (!longUrl) {
+          alert("Por favor ingresa una URL válida");
+          return;
+        }
+        const shortId = alias || Math.random().toString(36).substring(2, 8);
+        const ref = doc(db, "urls", shortId);
+        if ((await getDoc(ref)).exists()) {
+          alert("¡Este alias ya está en uso!");
+          return;
+        }
+        await setDoc(ref, {
+          longUrl,
+          clicks: 0,
+          createdAt: serverTimestamp(),
+          userId: auth.currentUser.uid
+        });
+        const shortUrl = `${window.location.origin}/r/${shortId}`;
+        shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+        resultContainer.style.display = 'block';
+        copyBtn.onclick = () => {
+          navigator.clipboard.writeText(shortUrl);
+          copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+          setTimeout(() => {
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+          }, 2000);
+        };
+        loadStats(auth.currentUser.uid);
+      });
+    } catch (error) {
+      console.error("Error al cargar firebase.js o inicializar Firebase:", error);
+      // Redirigir a login.html como respaldo
+      if (!isRedirecting) {
+        isRedirecting = true;
+        window.location.href = 'login.html';
       }
     }
-
-    shortenBtn.addEventListener("click", async () => {
-      const longUrl = longUrlInput.value.trim();
-      const alias = aliasInput.value.trim();
-      if (!longUrl) {
-        alert("Por favor ingresa una URL válida");
-        return;
-      }
-      const shortId = alias || Math.random().toString(36).substring(2, 8);
-      const ref = doc(db, "urls", shortId);
-      if ((await getDoc(ref)).exists()) {
-        alert("¡Este alias ya está en uso!");
-        return;
-      }
-      await setDoc(ref, {
-        longUrl,
-        clicks: 0,
-        createdAt: serverTimestamp(),
-        userId: auth.currentUser.uid
-      });
-      const shortUrl = `${window.location.origin}/r/${shortId}`;
-      shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
-      resultContainer.style.display = 'block';
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(shortUrl);
-        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
-        setTimeout(() => {
-          copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
-        }, 2000);
-      };
-      loadStats(auth.currentUser.uid);
-    });
   </script>
 </body>
 </html>
