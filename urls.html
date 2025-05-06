@@ -78,7 +78,15 @@
     const db = getFirestore(app);
 
     const formatDate = (date) => {
-      return date ? new Date(date).toLocaleString('es-ES') : 'N/A';
+      if (!date) return 'N/A';
+      try {
+        // Verifica si es un Timestamp de Firestore
+        const jsDate = date.toDate ? date.toDate() : new Date(date);
+        return jsDate.toLocaleString('es-ES');
+      } catch (e) {
+        console.error('Error formatting date:', e);
+        return 'N/A';
+      }
     };
 
     const loadURLs = async () => {
@@ -86,17 +94,25 @@
         const q = query(collection(db, "urls"), orderBy("createdAt", "desc"));
         const snapshot = await getDocs(q);
         
+        if (snapshot.empty) {
+          document.getElementById('urlList').innerHTML = '<p>No hay URLs acortadas aún</p>';
+          return;
+        }
+
         let html = '';
         snapshot.forEach(doc => {
-          const { longUrl, clicks, createdAt } = doc.data();
+          const data = doc.data();
+          const longUrl = data.longUrl || 'URL no disponible';
+          const clicks = data.clicks || 0;
+          const createdAt = data.createdAt;
           const shortUrl = `${window.location.origin}/r/${doc.id}`;
           
           html += `
             <div class="url-block">
               <p><strong>URL Corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
               <p><strong>URL Original:</strong> ${longUrl.length > 50 ? longUrl.substring(0, 50) + '...' : longUrl}</p>
-              <p><strong>Clics:</strong> ${clicks || 0}</p>
-              <p><strong>Fecha:</strong> ${formatDate(createdAt?.toDate())}</p>
+              <p><strong>Clics:</strong> ${clicks}</p>
+              <p><strong>Fecha:</strong> ${formatDate(createdAt)}</p>
               <div class="url-actions">
                 <button onclick="window.open('${shortUrl}', '_blank')">Abrir</button>
                 <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
@@ -105,8 +121,9 @@
           `;
         });
 
-        document.getElementById('urlList').innerHTML = html || '<p>No hay URLs acortadas aún</p>';
+        document.getElementById('urlList').innerHTML = html;
       } catch (error) {
+        console.error('Error loading URLs:', error);
         document.getElementById('urlList').innerHTML = `
           <p style="color:red">Error al cargar URLs: ${error.message}</p>
         `;
