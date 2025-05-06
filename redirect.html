@@ -3,128 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redireccionando - NK3IO</title>
+  <meta name="google-adsense-account" content="ca-pub-3539363562189833">
+  <title>Redirigiendo... | URLy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --secondary: #e0e7ff;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f8fafc;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
-      padding: 20px;
+      min-height: 100vh;
     }
     .redirect-container {
+      text-align: center;
+      padding: 40px;
       background: white;
       border-radius: 12px;
-      padding: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      max-width: 500px;
-      width: 100%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
-    .spinner {
-      font-size: 50px;
-      color: #4f46e5;
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
       margin-bottom: 20px;
-      animation: spin 1s linear infinite;
     }
-    @keyframes spin {
-      100% { transform: rotate(360deg); }
+    .logo-icon {
+      color: var(--primary);
+      font-size: 32px;
     }
-    .ad-container {
-      margin: 30px 0;
-      padding: 20px;
-      background: #e0e7ff;
-      border-radius: 8px;
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--dark);
     }
-    .ad-title {
-      font-weight: 600;
-      margin-bottom: 10px;
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    p {
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+    .error-message {
+      color: var(--error);
+      display: none;
     }
   </style>
 </head>
 <body>
   <div class="redirect-container">
-    <div class="spinner">
-      <i class="fas fa-circle-notch"></i>
+    <div class="logo">
+      <i class="fas fa-link logo-icon"></i>
+      <span class="logo-text">URLy</span>
     </div>
-    <h2>Redireccionando...</h2>
-    <p>Estás siendo redirigido a tu destino</p>
-
-    <div class="ad-container">
-      <div class="ad-title">Patrocinado por nuestros anunciantes</div>
-      <div id="adContent">
-        <!-- Anuncio será cargado aquí -->
-        <img src="https://via.placeholder.com/300x250?text=Anuncio+NK3IO" alt="Anuncio" style="max-width:100%;">
-      </div>
-    </div>
+    <h1>Redirigiendo...</h1>
+    <p>Por favor espera un momento.</p>
+    <div id="errorMessage" class="error-message"></div>
   </div>
-
   <script type="module">
     import { db } from './js/firebase.js';
-    import {
-      collection, query, where, getDocs, addDoc
-    } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Obtener el ID de la URL (ej: nk3io.netlify.app/r?id=abc123)
-const urlParams = new URLSearchParams(window.location.search);
-const shortCode = urlParams.get('id');  // "abc123"
+    const params = new URLSearchParams(window.location.search);
+    const alias = params.get('alias');
 
-if (!shortCode) {
-  window.location.href = '/';  // Redirige si no hay ID
-  return;
+    if (!alias) {
+      document.getElementById('errorMessage').textContent = 'URL no válida.';
+      document.getElementById('errorMessage').style.display = 'block';
+      return;
     }
 
-  try {
-    / Buscar en Firestore (usando shortCode, no shortId)
-const q = query(collection(db, "urls"), where("shortCode", "==", shortCode));
-const querySnapshot = await getDocs(q);
-
-if (querySnapshot.empty) {
-  window.location.href = '/';  // Redirige si no existe el código
-  return;
-}
-
-
-      // Actualizar contador de clicks
-      await updateDoc(doc.ref, {
-        clicks: increment(1)
-      });
-
-      // Registrar el click (opcional)
-      await addDoc(collection(db, "clicks"), {
-        shortCode,
-        timestamp: new Date(),
-        userId: urlData.userId
-      });
-
-      // Validar y formatear URL
-      let targetUrl = urlData.longUrl;
-      if (!targetUrl.startsWith('http')) {
-        targetUrl = 'https://' + targetUrl;
+    async function redirect() {
+      try {
+        const ref = doc(db, 'urls', alias);
+        const docSnap = await getDoc(ref);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          // Incrementar clics
+          await updateDoc(ref, {
+            clicks: (data.clicks || 0) + 1
+          });
+          // Redirigir
+          window.location.href = data.longUrl;
+        } else {
+          document.getElementById('errorMessage').textContent = 'URL no encontrada.';
+          document.getElementById('errorMessage').style.display = 'block';
+        }
+      } catch (error) {
+        console.error("Error al redirigir:", error);
+        document.getElementById('errorMessage').textContent = 'Error al redirigir. Intenta de nuevo.';
+        document.getElementById('errorMessage').style.display = 'block';
       }
-
-      // Redirigir después de 3 segundos
-const urlData = querySnapshot.docs[0].data();
-setTimeout(() => {
-  window.location.href = urlData.longUrl.startsWith('http')
-    ? urlData.longUrl
-    : `https://${urlData.longUrl}`;
-}, 3000);
-    } else {
-      window.location.href = '/404.html';  // Página de error personalizada
     }
-  } catch (error) {
-    console.error("Error en redirección:", error);
-    window.location.href = '/';
-  }
-}
 
-// Iniciar el proceso
-redirectToUrl();
+    redirect();
   </script>
 </body>
 </html>
