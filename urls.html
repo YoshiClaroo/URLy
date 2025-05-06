@@ -61,23 +61,11 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { db } from './firebase.js'; // Asegúrate de que la ruta sea correcta
+    import { collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-      authDomain: "urlyi-b3947.firebaseapp.com",
-      projectId: "urlyi-b3947",
-      storageBucket: "urlyi-b3947.appspot.com",
-      messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-      measurementId: "G-VPHWGQG61Q"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+    const auth = getAuth();
 
     const formatDate = (date) => {
       if (!date) return 'N/A';
@@ -153,7 +141,7 @@
       }
     });
 
-    // Iniciar sesión con Google (si necesitas un botón para esto, puedes agregarlo)
+    // Iniciar sesión con Google (puedes llamarlo desde un botón en index.html o aquí)
     const signInWithGoogle = async () => {
       try {
         const provider = new GoogleAuthProvider();
@@ -166,8 +154,8 @@
       }
     };
 
-    // Para pruebas, puedes llamar a signInWithGoogle manualmente o desde un botón
-    // Por ejemplo: <button onclick="signInWithGoogle()">Iniciar sesión con Google</button>
+    // Para pruebas, puedes descomentar la siguiente línea o agregar un botón
+    // signInWithGoogle();
   </script>
 </body>
 </html>
