@@ -109,30 +109,50 @@
     <div id="errorMessage" class="error-message"></div>
   </div>
   <script type="module">
-    import { auth } from './js/firebase.js';
-    import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    try {
+      import { auth } from './js/firebase.js';
+      import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-    const provider = new GoogleAuthProvider();
-    const googleSignIn = document.getElementById('googleSignIn');
-    const errorMessage = document.getElementById('errorMessage');
+      // Bandera para evitar redirecciones múltiples
+      let isRedirecting = false;
 
-    onAuthStateChanged(auth, (user) => {
-      console.log("onAuthStateChanged en login.html, usuario:", user);
-      if (user) {
-        window.location.href = 'index.html';
-      }
-    });
+      const provider = new GoogleAuthProvider();
+      const googleSignIn = document.getElementById('googleSignIn');
+      const errorMessage = document.getElementById('errorMessage');
 
-    googleSignIn.addEventListener('click', async () => {
-      try {
-        await signInWithPopup(auth, provider);
-        window.location.href = 'index.html';
-      } catch (error) {
-        console.error("Error signing in:", error);
-        errorMessage.textContent = 'Error al iniciar sesión. Intenta de nuevo.';
-        errorMessage.style.display = 'block';
-      }
-    });
+      // Verificar estado de autenticación
+      onAuthStateChanged(auth, (user) => {
+        console.log("onAuthStateChanged en login.html, usuario:", user);
+        if (isRedirecting) return; // Evitar redirecciones múltiples
+
+        if (user) {
+          // Usuario autenticado, redirigir a index.html
+          console.log("Usuario autenticado, redirigiendo a index.html");
+          isRedirecting = true;
+          window.location.href = 'index.html';
+        }
+      });
+
+      // Iniciar sesión con Google
+      googleSignIn.addEventListener('click', async () => {
+        if (isRedirecting) return;
+        try {
+          isRedirecting = true;
+          await signInWithPopup(auth, provider);
+          console.log("Inicio de sesión exitoso, redirigiendo a index.html");
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error("Error al iniciar sesión:", error);
+          errorMessage.textContent = 'Error al iniciar sesión. Intenta de nuevo.';
+          errorMessage.style.display = 'block';
+          isRedirecting = false;
+        }
+      });
+    } catch (error) {
+      console.error("Error al cargar firebase.js en login.html:", error);
+      document.getElementById('errorMessage').textContent = 'Error al cargar la configuración. Contacta al soporte.';
+      document.getElementById('errorMessage').style.display = 'block';
+    }
   </script>
 </body>
 </html>
