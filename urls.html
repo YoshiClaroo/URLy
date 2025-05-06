@@ -61,76 +61,76 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-      authDomain: "urlyi-b3947.firebaseapp.com",
-      projectId: "urlyi-b3947",
-      storageBucket: "urlyi-b3947.appspot.com",
-      messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-      measurementId: "G-VPHWGQG61Q"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+    authDomain: "urlyi-b3947.firebaseapp.com",
+    projectId: "urlyi-b3947",
+    storageBucket: "urlyi-b3947.appspot.com",
+    messagingSenderId: "732077984332",
+    appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+    measurementId: "G-VPHWGQG61Q"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const formatDate = (date) => {
-      if (!date) return 'N/A';
-      try {
-        // Verifica si es un Timestamp de Firestore
-        const jsDate = date.toDate ? date.toDate() : new Date(date);
-        return jsDate.toLocaleString('es-ES');
-      } catch (e) {
-        console.error('Error formatting date:', e);
-        return 'N/A';
+  const formatDate = (date) => {
+    if (!date) return 'N/A';
+    try {
+      const jsDate = date.toDate ? date.toDate() : new Date(date);
+      return jsDate.toLocaleString('es-ES');
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return 'N/A';
+    }
+  };
+
+  const loadURLs = async () => {
+    try {
+      const urlsCollection = collection(db, "urls");
+      const q = query(urlsCollection, orderBy("createdAt", "desc"));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        document.getElementById('urlList').innerHTML = '<p>No hay URLs acortadas aún</p>';
+        return;
       }
-    };
 
-    const loadURLs = async () => {
-      try {
-        const q = query(collection(db, "urls"), orderBy("createdAt", "desc"));
-        const snapshot = await getDocs(q);
+      let html = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const longUrl = data.longUrl || 'URL no disponible';
+        const clicks = data.clicks || 0;
+        const createdAt = data.createdAt;
+        const shortUrl = `${window.location.origin}/r/${doc.id}`;
         
-        if (snapshot.empty) {
-          document.getElementById('urlList').innerHTML = '<p>No hay URLs acortadas aún</p>';
-          return;
-        }
-
-        let html = '';
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const longUrl = data.longUrl || 'URL no disponible';
-          const clicks = data.clicks || 0;
-          const createdAt = data.createdAt;
-          const shortUrl = `${window.location.origin}/r/${doc.id}`;
-          
-          html += `
-            <div class="url-block">
-              <p><strong>URL Corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-              <p><strong>URL Original:</strong> ${longUrl.length > 50 ? longUrl.substring(0, 50) + '...' : longUrl}</p>
-              <p><strong>Clics:</strong> ${clicks}</p>
-              <p><strong>Fecha:</strong> ${formatDate(createdAt)}</p>
-              <div class="url-actions">
-                <button onclick="window.open('${shortUrl}', '_blank')">Abrir</button>
-                <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
-              </div>
+        html += `
+          <div class="url-block">
+            <p><strong>URL Corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+            <p><strong>URL Original:</strong> ${longUrl.length > 50 ? longUrl.substring(0, 50) + '...' : longUrl}</p>
+            <p><strong>Clics:</strong> ${clicks}</p>
+            <p><strong>Fecha:</strong> ${formatDate(createdAt)}</p>
+            <div class="url-actions">
+              <button onclick="window.open('${shortUrl}', '_blank')">Abrir</button>
+              <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
             </div>
-          `;
-        });
-
-        document.getElementById('urlList').innerHTML = html;
-      } catch (error) {
-        console.error('Error loading URLs:', error);
-        document.getElementById('urlList').innerHTML = `
-          <p style="color:red">Error al cargar URLs: ${error.message}</p>
+          </div>
         `;
-      }
-    };
+      });
 
-    window.addEventListener('load', loadURLs);
+      document.getElementById('urlList').innerHTML = html;
+    } catch (error) {
+      console.error('Error detallado al cargar URLs:', error);
+      document.getElementById('urlList').innerHTML = `
+        <p style="color:red">Error al cargar URLs: ${error.message}. Por favor, revisa la consola para más detalles.</p>
+      `;
+    }
+  };
+
+  window.addEventListener('load', loadURLs);
   </script>
 </body>
 </html>
