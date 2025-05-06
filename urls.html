@@ -61,76 +61,113 @@
   </div>
 
   <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-  import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, collection, query, where, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-    authDomain: "urlyi-b3947.firebaseapp.com",
-    projectId: "urlyi-b3947",
-    storageBucket: "urlyi-b3947.appspot.com",
-    messagingSenderId: "732077984332",
-    appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-    measurementId: "G-VPHWGQG61Q"
-  };
+    const firebaseConfig = {
+      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
+      authDomain: "urlyi-b3947.firebaseapp.com",
+      projectId: "urlyi-b3947",
+      storageBucket: "urlyi-b3947.appspot.com",
+      messagingSenderId: "732077984332",
+      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
+      measurementId: "G-VPHWGQG61Q"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-  const formatDate = (date) => {
-    if (!date) return 'N/A';
-    try {
-      const jsDate = date.toDate ? date.toDate() : new Date(date);
-      return jsDate.toLocaleString('es-ES');
-    } catch (e) {
-      console.error('Error formatting date:', e);
-      return 'N/A';
-    }
-  };
-
-  const loadURLs = async () => {
-    try {
-      const urlsCollection = collection(db, "urls");
-      const q = query(urlsCollection, orderBy("createdAt", "desc"));
-      const snapshot = await getDocs(q);
-
-      if (snapshot.empty) {
-        document.getElementById('urlList').innerHTML = '<p>No hay URLs acortadas aún</p>';
-        return;
+    const formatDate = (date) => {
+      if (!date) return 'N/A';
+      try {
+        const jsDate = date.toDate ? date.toDate() : new Date(date);
+        return jsDate.toLocaleString('es-ES');
+      } catch (e) {
+        console.error('Error formatting date:', e);
+        return 'N/A';
       }
+    };
 
-      let html = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const longUrl = data.longUrl || 'URL no disponible';
-        const clicks = data.clicks || 0;
-        const createdAt = data.createdAt;
-        const shortUrl = `${window.location.origin}/r/${doc.id}`;
-        
-        html += `
-          <div class="url-block">
-            <p><strong>URL Corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
-            <p><strong>URL Original:</strong> ${longUrl.length > 50 ? longUrl.substring(0, 50) + '...' : longUrl}</p>
-            <p><strong>Clics:</strong> ${clicks}</p>
-            <p><strong>Fecha:</strong> ${formatDate(createdAt)}</p>
-            <div class="url-actions">
-              <button onclick="window.open('${shortUrl}', '_blank')">Abrir</button>
-              <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
+    const loadURLs = async (user) => {
+      try {
+        if (!user) {
+          document.getElementById('urlList').innerHTML = `
+            <p style="color:red">Por favor, inicia sesión para ver tus URLs.</p>
+          `;
+          return;
+        }
+
+        const q = query(
+          collection(db, "urls"),
+          where("userId", "==", user.uid),
+          orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          document.getElementById('urlList').innerHTML = '<p>No hay URLs acortadas aún</p>';
+          return;
+        }
+
+        let html = '';
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          const longUrl = data.longUrl || 'URL no disponible';
+          const clicks = data.clicks || 0;
+          const createdAt = data.createdAt;
+          const shortUrl = `${window.location.origin}/r/${doc.id}`;
+          
+          html += `
+            <div class="url-block">
+              <p><strong>URL Corta:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></p>
+              <p><strong>URL Original:</strong> ${longUrl.length > 50 ? longUrl.substring(0, 50) + '...' : longUrl}</p>
+              <p><strong>Clics:</strong> ${clicks}</p>
+              <p><strong>Fecha:</strong> ${formatDate(createdAt)}</p>
+              <div class="url-actions">
+                <button onclick="window.open('${shortUrl}', '_blank')">Abrir</button>
+                <button onclick="navigator.clipboard.writeText('${shortUrl}')">Copiar</button>
+              </div>
             </div>
-          </div>
+          `;
+        });
+
+        document.getElementById('urlList').innerHTML = html;
+      } catch (error) {
+        console.error('Error detallado al cargar URLs:', error);
+        document.getElementById('urlList').innerHTML = `
+          <p style="color:red">Error al cargar URLs: ${error.message}. Por favor, revisa la consola para más detalles.</p>
         `;
-      });
+      }
+    };
 
-      document.getElementById('urlList').innerHTML = html;
-    } catch (error) {
-      console.error('Error detallado al cargar URLs:', error);
-      document.getElementById('urlList').innerHTML = `
-        <p style="color:red">Error al cargar URLs: ${error.message}. Por favor, revisa la consola para más detalles.</p>
-      `;
-    }
-  };
+    // Monitorear estado de autenticación
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        loadURLs(user); // Cargar URLs del usuario autenticado
+      } else {
+        document.getElementById('urlList').innerHTML = `
+          <p style="color:red">Por favor, inicia sesión para ver tus URLs.</p>
+        `;
+      }
+    });
 
-  window.addEventListener('load', loadURLs);
+    // Iniciar sesión con Google (si necesitas un botón para esto, puedes agregarlo)
+    const signInWithGoogle = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error('Error al iniciar sesión con Google:', error);
+        document.getElementById('urlList').innerHTML = `
+          <p style="color:red">Error al iniciar sesión: ${error.message}</p>
+        `;
+      }
+    };
+
+    // Para pruebas, puedes llamar a signInWithGoogle manualmente o desde un botón
+    // Por ejemplo: <button onclick="signInWithGoogle()">Iniciar sesión con Google</button>
   </script>
 </body>
 </html>
