@@ -14,7 +14,6 @@
       --light: #f8fafc;
       --gray: #64748b;
     }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--light);
@@ -22,13 +21,11 @@
       margin: 0;
       line-height: 1.6;
     }
-
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
-
     header {
       background-color: white;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
@@ -37,31 +34,26 @@
       top: 0;
       z-index: 100;
     }
-
     .header-content {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
     .logo {
       display: flex;
       align-items: center;
       gap: 10px;
       text-decoration: none;
     }
-
     .logo-icon {
       color: var(--primary);
       font-size: 28px;
     }
-
     .logo-text {
       font-size: 24px;
       font-weight: 700;
       color: var(--dark);
     }
-
     .auth-button {
       background: var(--primary);
       color: white;
@@ -75,29 +67,24 @@
       gap: 8px;
       transition: background 0.3s;
     }
-
     .auth-button:hover {
       background: var(--primary-dark);
     }
-
     .hero {
       text-align: center;
       padding: 80px 0;
     }
-
     .hero h1 {
       font-size: 3rem;
       margin-bottom: 20px;
       color: var(--dark);
     }
-
     .hero p {
       font-size: 1.2rem;
       color: var(--gray);
       max-width: 700px;
       margin: 0 auto 40px;
     }
-
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -105,7 +92,6 @@
       margin: 60px auto;
       max-width: 1000px;
     }
-
     .feature-card {
       background: white;
       border-radius: 12px;
@@ -113,34 +99,28 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
       transition: transform 0.3s;
     }
-
     .feature-card:hover {
       transform: translateY(-5px);
     }
-
     .feature-icon {
       font-size: 36px;
       color: var(--primary);
       margin-bottom: 20px;
     }
-
     .feature-title {
       font-size: 1.3rem;
       margin-bottom: 15px;
       color: var(--dark);
     }
-
     .feature-desc {
       color: var(--gray);
     }
-
     .how-it-works {
       background: var(--primary);
       color: white;
       padding: 60px 0;
       text-align: center;
     }
-
     .steps {
       display: flex;
       justify-content: center;
@@ -148,14 +128,12 @@
       margin-top: 40px;
       flex-wrap: wrap;
     }
-
     .step {
       background: rgba(255,255,255,0.1);
       border-radius: 12px;
       padding: 25px;
       width: 200px;
     }
-
     .step-number {
       background: white;
       color: var(--primary);
@@ -168,36 +146,30 @@
       margin: 0 auto 15px;
       font-weight: bold;
     }
-
     footer {
       background: var(--dark);
       color: white;
       padding: 40px 0;
       text-align: center;
     }
-
     .footer-links {
       display: flex;
       justify-content: center;
       gap: 30px;
       margin-bottom: 20px;
     }
-
     .footer-link {
       color: #94a3b8;
       text-decoration: none;
       transition: color 0.3s;
     }
-
     .footer-link:hover {
       color: white;
     }
-
     @media (max-width: 768px) {
       .hero h1 {
         font-size: 2.2rem;
       }
-
       .steps {
         flex-direction: column;
         align-items: center;
@@ -206,10 +178,9 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
   <header>
     <div class="container header-content">
-      <a href="index.html" class="logo">
+      <a href="/" class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </a>
@@ -219,8 +190,6 @@
       </button>
     </div>
   </header>
-
-  <!-- Hero Section -->
   <section class="hero">
     <div class="container">
       <h1>Acorta y Comparte tus Enlaces con URLy</h1>
@@ -231,8 +200,6 @@
       </button>
     </div>
   </section>
-
-  <!-- Features -->
   <section class="container">
     <div class="features">
       <div class="feature-card">
@@ -258,13 +225,10 @@
       </div>
     </div>
   </section>
-
-  <!-- How It Works -->
   <section class="how-it-works">
     <div class="container">
       <h2>Cómo funciona URLy</h2>
       <p>Sigue estos simples pasos para acortar tus enlaces</p>
-
       <div class="steps">
         <div class="step">
           <div class="step-number">1</div>
@@ -284,8 +248,6 @@
       </div>
     </div>
   </section>
-
-  <!-- Footer -->
   <footer>
     <div class="container">
       <div class="footer-links">
@@ -296,26 +258,11 @@
       <p>© 2025 URLy. Todos los derechos reservados.</p>
     </div>
   </footer>
-
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { auth, db } from './js/firebase.js';
+    import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-      authDomain: "urlyi-b3947.firebaseapp.com",
-      projectId: "urlyi-b3947",
-      storageBucket: "urlyi-b3947.appspot.com",
-      messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-      measurementId: "G-VPHWGQG61Q"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
     function loginWithGoogle() {
@@ -323,14 +270,12 @@
         .then((result) => {
           const user = result.user;
           const userRef = doc(db, 'users', user.uid);
-
           setDoc(userRef, {
             email: user.email,
             displayName: user.displayName || user.email.split('@')[0],
             lastLogin: new Date(),
             createdAt: serverTimestamp()
           }, { merge: true });
-
           window.location.href = "index.html";
         })
         .catch((error) => {
