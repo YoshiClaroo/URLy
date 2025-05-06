@@ -3,142 +3,128 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redireccionando... | URLy</title>
+  <title>Redireccionando - NK3IO</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: white;
-      color: #1e40af;
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
       margin: 0;
       text-align: center;
+      padding: 20px;
     }
-    .loader {
-      border: 5px solid rgba(30, 64, 175, 0.2);
-      border-top: 5px solid #1e40af;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
+    .redirect-container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    .spinner {
+      font-size: 50px;
+      color: #4f46e5;
       margin-bottom: 20px;
+      animation: spin 1s linear infinite;
     }
     @keyframes spin {
-      0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .error {
-      color: #dc2626;
-      margin-top: 20px;
+    .ad-container {
+      margin: 30px 0;
+      padding: 20px;
+      background: #e0e7ff;
+      border-radius: 8px;
     }
-    .btn {
-      background: #1e40af;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-decoration: none;
-      margin-top: 15px;
-      display: inline-block;
+    .ad-title {
+      font-weight: 600;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="loader"></div>
-  <p>Redirigiendo...</p>
-  <p id="error" class="error" style="display: none;"></p>
-  <a id="manualRedirect" class="btn" style="display: none;" href="#">Click aquí si no redirige</a>
+  <div class="redirect-container">
+    <div class="spinner">
+      <i class="fas fa-circle-notch"></i>
+    </div>
+    <h2>Redireccionando...</h2>
+    <p>Estás siendo redirigido a tu destino</p>
+
+    <div class="ad-container">
+      <div class="ad-title">Patrocinado por nuestros anunciantes</div>
+      <div id="adContent">
+        <!-- Anuncio será cargado aquí -->
+        <img src="https://via.placeholder.com/300x250?text=Anuncio+NK3IO" alt="Anuncio" style="max-width:100%;">
+      </div>
+    </div>
+  </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { db } from './js/firebase.js';
+    import {
+      collection, query, where, getDocs, addDoc
+    } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-    // Configuración Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyAt79jrJpE2OZgb9MunFkjREeB3t4_Vznk",
-      authDomain: "urlyi-b3947.firebaseapp.com",
-      projectId: "urlyi-b3947",
-      storageBucket: "urlyi-b3947.appspot.com",
-      messagingSenderId: "732077984332",
-      appId: "1:732077984332:web:840e5c1eb645999ede82e9",
-      measurementId: "G-VPHWGQG61Q"
-    };
+    // Obtener el ID de la URL (ej: nk3io.netlify.app/r?id=abc123)
+const urlParams = new URLSearchParams(window.location.search);
+const shortCode = urlParams.get('id');  // "abc123"
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const urlId = window.location.pathname.split('/').pop();
+if (!shortCode) {
+  window.location.href = '/';  // Redirige si no hay ID
+  return;
+    }
 
-    // Configuración ShrinkMe.io
-    const SHRINKME_API_KEY = "0c35c00f33efb07d85c2131175e7062d6f529b1a"; // Tu API Token
+  try {
+    / Buscar en Firestore (usando shortCode, no shortId)
+const q = query(collection(db, "urls"), where("shortCode", "==", shortCode));
+const querySnapshot = await getDocs(q);
 
-    async function getShrinkMeUrl(longUrl) {
-      try {
-        // Usamos formato text para respuesta más simple
-        const apiUrl = `https://shrinkme.io/api?api=${SHRINKME_API_KEY}&url=${encodeURIComponent(longUrl)}&alias=${urlId}&format=text`;
-        
-        const response = await fetch(apiUrl);
-        
-        if (!response.ok) {
-          throw new Error("Error en la API de ShrinkMe");
-        }
-        
-        const shortUrl = await response.text();
-        
-        // Verificamos que la respuesta sea una URL válida
-        if (!shortUrl.startsWith("http")) {
-          throw new Error("Respuesta inválida de ShrinkMe");
-        }
-        
-        return shortUrl;
-      } catch (error) {
-        console.error("Error con ShrinkMe.io:", error);
-        // Si falla, usamos la URL original como respaldo
-        return longUrl;
+if (querySnapshot.empty) {
+  window.location.href = '/';  // Redirige si no existe el código
+  return;
+}
+
+
+      // Actualizar contador de clicks
+      await updateDoc(doc.ref, {
+        clicks: increment(1)
+      });
+
+      // Registrar el click (opcional)
+      await addDoc(collection(db, "clicks"), {
+        shortCode,
+        timestamp: new Date(),
+        userId: urlData.userId
+      });
+
+      // Validar y formatear URL
+      let targetUrl = urlData.longUrl;
+      if (!targetUrl.startsWith('http')) {
+        targetUrl = 'https://' + targetUrl;
       }
+
+      // Redirigir después de 3 segundos
+const urlData = querySnapshot.docs[0].data();
+setTimeout(() => {
+  window.location.href = urlData.longUrl.startsWith('http')
+    ? urlData.longUrl
+    : `https://${urlData.longUrl}`;
+}, 3000);
+    } else {
+      window.location.href = '/404.html';  // Página de error personalizada
     }
+  } catch (error) {
+    console.error("Error en redirección:", error);
+    window.location.href = '/';
+  }
+}
 
-    async function redirect() {
-      try {
-        const urlRef = doc(db, "urls", urlId);
-        const urlDoc = await getDoc(urlRef);
-
-        if (urlDoc.exists()) {
-          // 1. Registra el click en Firebase
-          await updateDoc(urlRef, { clicks: increment(1) });
-          
-          // 2. Obtiene URL de ShrinkMe.io
-          const shrinkUrl = await getShrinkMeUrl(urlDoc.data().longUrl);
-          
-          // 3. Muestra botón de redirección manual
-          const manualBtn = document.getElementById('manualRedirect');
-          manualBtn.href = shrinkUrl;
-          manualBtn.style.display = 'inline-block';
-          manualBtn.textContent = `Ir a ${new URL(shrinkUrl).hostname}`;
-          
-          // 4. Redirige automáticamente después de 1.5 segundos
-          setTimeout(() => {
-            window.location.href = shrinkUrl;
-          }, 1500);
-        } else {
-          showError("Enlace no encontrado");
-        }
-      } catch (error) {
-        showError("Error al redirigir: " + error.message);
-        console.error("Error crítico:", error);
-      }
-    }
-
-    function showError(message) {
-      document.querySelector('.loader').style.display = 'none';
-      const errorEl = document.getElementById('error');
-      errorEl.textContent = message;
-      errorEl.style.display = 'block';
-    }
-
-    // Iniciar redirección
-    redirect();
+// Iniciar el proceso
+redirectToUrl();
   </script>
 </body>
 </html>
