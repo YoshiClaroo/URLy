@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Iniciar Sesión | URLy</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     :root {
       --primary: #1e40af;
@@ -106,63 +106,36 @@
     </button>
     <div id="errorMessage" class="error-message"></div>
   </div>
+
   <script type="module">
-    console.log("Iniciando script de login.html");
-    try {
-      // Verificar carga de firebase.js
-      console.log("Intentando importar firebase.js");
-      import { auth } from './js/firebase.js';
-      import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { auth } from './js/firebase.js';
+    import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-      console.log("Módulos importados correctamente");
+    const googleSignIn = document.getElementById('googleSignIn');
+    const errorMessage = document.getElementById('errorMessage');
+    const provider = new GoogleAuthProvider();
+    let isRedirecting = false;
 
-      const googleSignIn = document.getElementById('googleSignIn');
-      const errorMessage = document.getElementById('errorMessage');
-
-      console.log("googleSignIn:", googleSignIn);
-
-      if (!googleSignIn) {
-        console.error("Botón googleSignIn no encontrado");
-        errorMessage.textContent = "Error: Botón de inicio de sesión no encontrado";
-        errorMessage.style.display = 'block';
-        return;
-      }
-
-      let isRedirecting = false;
-      const provider = new GoogleAuthProvider();
-
-      onAuthStateChanged(auth, (user) => {
-        console.log("onAuthStateChanged ejecutado, usuario:", user);
-        if (isRedirecting) return;
-        if (user) {
-          console.log("Usuario autenticado, redirigiendo a index.html");
-          isRedirecting = true;
-          window.location.href = 'index.html';
-        }
-      });
-
-      googleSignIn.addEventListener('click', async (event) => {
-        console.log("Botón de Google Sign-In clickeado", event);
-        if (isRedirecting) return;
+    onAuthStateChanged(auth, (user) => {
+      if (isRedirecting) return;
+      if (user) {
         isRedirecting = true;
-        try {
-          console.log("Iniciando signInWithPopup");
-          const result = await signInWithPopup(auth, provider);
-          console.log("Inicio de sesión exitoso, usuario:", result.user);
-          window.location.href = 'index.html';
-        } catch (error) {
-          console.error("Error al iniciar sesión:", error.code, error.message);
-          errorMessage.textContent = `Error al iniciar sesión: ${error.message}`;
-          errorMessage.style.display = 'block';
-          isRedirecting = false;
-        }
-      });
-    } catch (error) {
-      console.error("Error al inicializar login.html:", error);
-      const errorMessage = document.getElementById('errorMessage');
-      errorMessage.textContent = `Error al cargar la página: ${error.message}`;
-      errorMessage.style.display = 'block';
-    }
+        window.location.href = 'index.html';
+      }
+    });
+
+    googleSignIn.addEventListener('click', async () => {
+      if (isRedirecting) return;
+      isRedirecting = true;
+      try {
+        await signInWithPopup(auth, provider);
+        window.location.href = 'index.html';
+      } catch (error) {
+        errorMessage.textContent = `Error al iniciar sesión: ${error.message}`;
+        errorMessage.style.display = 'block';
+        isRedirecting = false;
+      }
+    });
   </script>
 </body>
 </html>
