@@ -1,0 +1,14 @@
+[[redirects]]
+  from = "/r/:alias"
+  to = "/redirect.html?alias=:alias"
+  status = 200
+
+[[redirects]]
+  from = "/"
+  to = "/login.html"
+  status = 200
+
+[[headers]]
+  for = "/ads.txt"
+  [headers.values]
+    "Content-Type" = "text/plain"
