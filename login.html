@@ -13,7 +13,6 @@
       --dark: #1e293b;
       --light: #f8fafc;
       --gray: #64748b;
-      --success: #10b981;
       --error: #ef4444;
     }
     * {
@@ -22,10 +21,9 @@
       padding: 0;
     }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', sans-serif;
       background-color: var(--light);
       color: var(--dark);
-      line-height: 1.6;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -111,15 +109,17 @@
   <script type="module">
     console.log("Iniciando script de login.html");
     try {
+      // Verificar carga de firebase.js
+      console.log("Intentando importar firebase.js");
       import { auth } from './js/firebase.js';
       import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-      let isRedirecting = false;
-      const provider = new GoogleAuthProvider();
+      console.log("Módulos importados correctamente");
+
       const googleSignIn = document.getElementById('googleSignIn');
       const errorMessage = document.getElementById('errorMessage');
 
-      console.log("googleSignIn button:", googleSignIn);
+      console.log("googleSignIn:", googleSignIn);
 
       if (!googleSignIn) {
         console.error("Botón googleSignIn no encontrado");
@@ -128,10 +128,12 @@
         return;
       }
 
+      let isRedirecting = false;
+      const provider = new GoogleAuthProvider();
+
       onAuthStateChanged(auth, (user) => {
         console.log("onAuthStateChanged ejecutado, usuario:", user);
         if (isRedirecting) return;
-
         if (user) {
           console.log("Usuario autenticado, redirigiendo a index.html");
           isRedirecting = true;
