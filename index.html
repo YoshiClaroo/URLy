@@ -511,10 +511,9 @@
       // Esperar a que Firebase inicialice el estado de autenticación
       onAuthStateChanged(auth, (user) => {
         console.log("onAuthStateChanged ejecutado en index.html, usuario:", user);
-        if (isRedirecting) return; // Evitar redirecciones múltiples
+        if (isRedirecting) return;
 
         if (user) {
-          // Usuario autenticado, actualizar UI
           console.log("Usuario autenticado, actualizando UI");
           const userAvatar = document.getElementById('userAvatar');
           const welcomeName = document.getElementById('welcomeName');
@@ -522,7 +521,6 @@
           welcomeName.textContent = `Hola, ${user.displayName || user.email.split('@')[0]}`;
           loadStats(user.uid);
         } else {
-          // No hay usuario, redirigir a login.html
           console.log("No hay usuario autenticado, redirigiendo a login.html");
           isRedirecting = true;
           window.location.href = 'login.html';
@@ -583,37 +581,51 @@
       shortenBtn.addEventListener("click", async () => {
         const longUrl = longUrlInput.value.trim();
         const alias = aliasInput.value.trim();
-        if (!longUrl) {
-          alert("Por favor ingresa una URL válida");
+
+        // Validar longUrl
+        if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
+          alert("Por favor ingresa una URL válida (por ejemplo, https://ejemplo.com)");
           return;
         }
+
+        // Validar alias (si se proporciona)
+        if (alias && !/^[a-zA-Z0-9_-]+$/.test(alias)) {
+          alert("El alias solo puede contener letras, números, guiones y guiones bajos.");
+          return;
+        }
+
         const shortId = alias || Math.random().toString(36).substring(2, 8);
         const ref = doc(db, "urls", shortId);
-        if ((await getDoc(ref)).exists()) {
-          alert("¡Este alias ya está en uso!");
-          return;
+        try {
+          if ((await getDoc(ref)).exists()) {
+            alert("¡Este alias ya está en uso!");
+            return;
+          }
+
+          await setDoc(ref, {
+            longUrl,
+            clicks: 0,
+            createdAt: serverTimestamp(),
+            userId: auth.currentUser.uid
+          });
+          const shortUrl = `${window.location.origin}/r/${shortId}`;
+          shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+          resultContainer.style.display = 'block';
+          copyBtn.onclick = () => {
+            navigator.clipboard.writeText(shortUrl);
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(() => {
+              copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+            }, 2000);
+          };
+          loadStats(auth.currentUser.uid);
+        } catch (error) {
+          console.error("Error al crear URL acortada:", error);
+          alert("Error al crear la URL. Intenta de nuevo.");
         }
-        await setDoc(ref, {
-          longUrl,
-          clicks: 0,
-          createdAt: serverTimestamp(),
-          userId: auth.currentUser.uid
-        });
-        const shortUrl = `${window.location.origin}/r/${shortId}`;
-        shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
-        resultContainer.style.display = 'block';
-        copyBtn.onclick = () => {
-          navigator.clipboard.writeText(shortUrl);
-          copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
-          setTimeout(() => {
-            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
-          }, 2000);
-        };
-        loadStats(auth.currentUser.uid);
       });
     } catch (error) {
       console.error("Error al cargar firebase.js o inicializar Firebase:", error);
-      // Redirigir a login.html como respaldo
       if (!isRedirecting) {
         isRedirecting = true;
         window.location.href = 'login.html';
@@ -621,4 +633,4 @@
     }
   </script>
 </body>
-</html>
+        </html>
