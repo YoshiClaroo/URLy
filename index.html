@@ -368,21 +368,6 @@
       display: none;
       text-align: center;
     }
-    @media (max-width: 768px) {
-      .form-row {
-        flex-direction: column;
-      }
-      .welcome-banner {
-        flex-direction: column;
-        text-align: center;
-      }
-      .welcome-icon {
-        display: none;
-      }
-      .action-buttons {
-        flex-direction: column;
-      }
-    }
   </style>
 </head>
 <body>
@@ -507,14 +492,27 @@
     </div>
   </div>
   <script type="module">
+    console.log("Iniciando script de index.html");
     try {
-      console.log("Script de index.html cargado");
       import { auth, db } from './js/firebase.js';
       import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-      // Bandera para evitar redirecciones múltiples
       let isRedirecting = false;
+
+      // Inicializar elementos
+      const userAvatar = document.getElementById('userAvatar');
+      const welcomeName = document.getElementById('welcomeName');
+      const signOutBtn = document.getElementById('signOutBtn');
+      const shortenBtn = document.getElementById('shortenBtn');
+      const longUrlInput = document.getElementById('longUrl');
+      const aliasInput = document.getElementById('alias');
+      const resultContainer = document.getElementById('resultContainer');
+      const shortUrlElement = document.getElementById('shortUrl');
+      const copyBtn = document.getElementById('copyBtn');
+      const errorMessage = document.getElementById('errorMessage');
+
+      console.log("Elementos inicializados:", { signOutBtn, shortenBtn });
 
       // Verificar autenticación
       onAuthStateChanged(auth, (user) => {
@@ -523,8 +521,6 @@
 
         if (user) {
           console.log("Usuario autenticado, actualizando UI");
-          const userAvatar = document.getElementById('userAvatar');
-          const welcomeName = document.getElementById('welcomeName');
           if (user.photoURL) userAvatar.src = user.photoURL;
           welcomeName.textContent = `Hola, ${user.displayName || user.email.split('@')[0]}`;
           loadStats(user.uid);
@@ -536,23 +532,27 @@
       });
 
       // Configurar botón de cerrar sesión
-      const signOutBtn = document.getElementById('signOutBtn');
-      console.log("signOutBtn:", signOutBtn);
-      signOutBtn.addEventListener('click', async () => {
-        console.log("Botón de cerrar sesión clickeado");
-        if (isRedirecting) return;
-        isRedirecting = true;
-        try {
-          await signOut(auth);
-          console.log("Sesión cerrada, redirigiendo a login.html");
-          window.location.href = 'login.html';
-        } catch (error) {
-          console.error("Error al cerrar sesión:", error.code, error.message);
-          document.getElementById('errorMessage').textContent = `Error al cerrar sesión: ${error.message}`;
-          document.getElementById('errorMessage').style.display = 'block';
-          isRedirecting = false;
-        }
-      });
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', async (event) => {
+          console.log("Botón de cerrar sesión clickeado", event);
+          if (isRedirecting) return;
+          isRedirecting = true;
+          try {
+            await signOut(auth);
+            console.log("Sesión cerrada, redirigiendo a login.html");
+            window.location.href = 'login.html';
+          } catch (error) {
+            console.error("Error al cerrar sesión:", error.code, error.message);
+            errorMessage.textContent = `Error al cerrar sesión: ${error.message}`;
+            errorMessage.style.display = 'block';
+            isRedirecting = false;
+          }
+        });
+      } else {
+        console.error("signOutBtn no encontrado");
+        errorMessage.textContent = "Error: Botón de cerrar sesión no encontrado";
+        errorMessage.style.display = 'block';
+      }
 
       // Manejo de cookies
       if (!localStorage.getItem('cookies-accepted')) {
@@ -582,86 +582,92 @@
           document.getElementById('totalLinks').textContent = querySnapshot.size;
           document.getElementById('totalVisits').textContent = totalClicks;
         } catch (error) {
-          console.error("Error al cargar estadísticas:", error);
-          document.getElementById('errorMessage').textContent = `Error al cargar estadísticas: ${error.message}`;
-          document.getElementById('errorMessage').style.display = 'block';
+          console.error("Error al cargar estadísticas:", error.code, error.message);
+          errorMessage.textContent = `Error al cargar estadísticas: ${error.message}`;
+          errorMessage.style.display = 'block';
         }
       }
 
       // Acortar URL
-      const shortenBtn = document.getElementById("shortenBtn");
-      const longUrlInput = document.getElementById("longUrl");
-      const aliasInput = document.getElementById("alias");
-      const resultContainer = document.getElementById("resultContainer");
-      const shortUrlElement = document.getElementById("shortUrl");
-      const copyBtn = document.getElementById("copyBtn");
-      const errorMessage = document.getElementById("errorMessage");
+      if (shortenBtn) {
+        shortenBtn.addEventListener('click', async (event) => {
+          console.log("Botón de acortar URL clickeado", event);
+          errorMessage.style.display = 'none';
+          const longUrl = longUrlInput.value.trim();
+          const alias = aliasInput.value.trim();
 
-      console.log("shortenBtn:", shortenBtn);
-      shortenBtn.addEventListener("click", async () => {
-        console.log("Botón de acortar URL clickeado");
-        const longUrl = longUrlInput.value.trim();
-        const alias = aliasInput.value.trim();
-
-        // Validar longUrl
-        if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
-          errorMessage.textContent = "Por favor ingresa una URL válida (por ejemplo, https://ejemplo.com)";
-          errorMessage.style.display = 'block';
-          return;
-        }
-
-        // Validar alias
-        if (alias && !/^[a-zA-Z0-9_-]+$/.test(alias)) {
-          errorMessage.textContent = "El alias solo puede contener letras, números, guiones y guiones bajos";
-          errorMessage.style.display = 'block';
-          return;
-        }
-
-        const shortId = alias || Math.random().toString(36).substring(2, 8);
-        const ref = doc(db, "urls", shortId);
-        try {
-          console.log("Verificando si el alias existe:", shortId);
-          if ((await getDoc(ref)).exists()) {
-            errorMessage.textContent = "¡Este alias ya está en uso!";
+          if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
+            console.log("URL inválida:", longUrl);
+            errorMessage.textContent = "Por favor ingresa una URL válida (por ejemplo, https://ejemplo.com)";
             errorMessage.style.display = 'block';
             return;
           }
 
-          console.log("Creando URL acortada:", { longUrl, shortId });
-          await setDoc(ref, {
-            longUrl,
-            clicks: 0,
-            createdAt: serverTimestamp(),
-            userId: auth.currentUser.uid
-          });
-          const shortUrl = `${window.location.origin}/r/${shortId}`;
-          shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
-          resultContainer.style.display = 'block';
-          errorMessage.style.display = 'none';
+          if (alias && !/^[a-zA-Z0-9_-]+$/.test(alias)) {
+            console.log("Alias inválido:", alias);
+            errorMessage.textContent = "El alias solo puede contener letras, números, guiones y guiones bajos";
+            errorMessage.style.display = 'block';
+            return;
+          }
 
-          copyBtn.onclick = () => {
-            console.log("Copiando URL:", shortUrl);
-            navigator.clipboard.writeText(shortUrl);
-            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
-            setTimeout(() => {
-              copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
-            }, 2000);
-          };
-          loadStats(auth.currentUser.uid);
-        } catch (error) {
-          console.error("Error al acortar URL:", error.code, error.message);
-          errorMessage.textContent = `Error al acortar URL: ${error.message}`;
-          errorMessage.style.display = 'block';
-        }
-      });
-    } catch (error) {
-      console.error("Error al inicializar script de index.html:", error);
-      document.getElementById('errorMessage').textContent = `Error al cargar la página: ${error.message}`;
-      document.getElementById('errorMessage').style.display = 'block';
-      if (!isRedirecting) {
-        isRedirecting = true;
-        window.location.href = 'login.html';
+          const shortId = alias || Math.random().toString(36).substring(2, 8);
+          const ref = doc(db, "urls", shortId);
+          try {
+            console.log("Verificando alias:", shortId);
+            if ((await getDoc(ref)).exists()) {
+              console.log("Alias ya en uso:", shortId);
+              errorMessage.textContent = "¡Este alias ya está en uso!";
+              errorMessage.style.display = 'block';
+              return;
+            }
+
+            if (!auth.currentUser) {
+              console.error("No hay usuario autenticado para crear URL");
+              errorMessage.textContent = "Error: Debes estar autenticado";
+              errorMessage.style.display = 'block';
+              isRedirecting = true;
+              window.location.href = 'login.html';
+              return;
+            }
+
+            console.log("Creando URL acortada:", { longUrl, shortId });
+            await setDoc(ref, {
+              longUrl,
+              clicks: 0,
+              createdAt: serverTimestamp(),
+              userId: auth.currentUser.uid
+            });
+
+            const shortUrl = `${window.location.origin}/r/${shortId}`;
+            shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
+            resultContainer.style.display = 'block';
+
+            copyBtn.onclick = () => {
+              console.log("Copiando URL:", shortUrl);
+              navigator.clipboard.writeText(shortUrl);
+              copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+              setTimeout(() => {
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+              }, 2000);
+            };
+
+            loadStats(auth.currentUser.uid);
+          } catch (error) {
+            console.error("Error al acortar URL:", error.code, error.message);
+            errorMessage.textContent = `Error al acortar URL: ${error.message}`;
+            errorMessage.style.display = 'block';
+          }
+        });
+      } else {
+        console.error("shortenBtn no encontrado");
+        errorMessage.textContent = "Error: Botón de acortar URL no encontrado";
+        errorMessage.style.display = 'block';
       }
+    } catch (error) {
+      console.error("Error al inicializar index.html:", error);
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = `Error al cargar la página: ${error.message}`;
+      errorMessage.style.display = 'block';
     }
   </script>
 </body>
