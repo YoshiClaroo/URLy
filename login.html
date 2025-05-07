@@ -109,31 +109,32 @@
 
   <script type="module">
     import { auth } from './js/firebase.js';
-    import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      signInWithPopup,
+      GoogleAuthProvider,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     const googleSignIn = document.getElementById('googleSignIn');
     const errorMessage = document.getElementById('errorMessage');
     const provider = new GoogleAuthProvider();
-    let isRedirecting = false;
+
+    let alreadyRedirected = false;
 
     onAuthStateChanged(auth, (user) => {
-      if (isRedirecting) return;
-      if (user) {
-        isRedirecting = true;
-        window.location.href = 'index.html';
+      if (user && !alreadyRedirected) {
+        alreadyRedirected = true;
+        window.location.replace('index.html');
       }
     });
 
     googleSignIn.addEventListener('click', async () => {
-      if (isRedirecting) return;
-      isRedirecting = true;
       try {
         await signInWithPopup(auth, provider);
-        window.location.href = 'index.html';
+        window.location.replace('index.html');
       } catch (error) {
         errorMessage.textContent = `Error al iniciar sesión: ${error.message}`;
         errorMessage.style.display = 'block';
-        isRedirecting = false;
       }
     });
   </script>
