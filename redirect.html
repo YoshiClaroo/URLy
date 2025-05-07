@@ -85,33 +85,47 @@
 
     const params = new URLSearchParams(window.location.search);
     const alias = params.get('alias');
+    const errorMessage = document.getElementById('errorMessage');
 
     if (!alias) {
-      document.getElementById('errorMessage').textContent = 'URL no válida.';
-      document.getElementById('errorMessage').style.display = 'block';
+      errorMessage.textContent = 'URL no válida.';
+      errorMessage.style.display = 'block';
       return;
     }
 
     async function redirect() {
       try {
+        console.log("Buscando documento con alias:", alias);
         const ref = doc(db, 'urls', alias);
         const docSnap = await getDoc(ref);
+
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // Incrementar clics
+          const longUrl = data.longUrl;
+
+          if (!longUrl || !/^https?:\/\//i.test(longUrl)) {
+            console.error("URL inválida:", longUrl);
+            errorMessage.textContent = 'La URL destino no es válida.';
+            errorMessage.style.display = 'block';
+            return;
+          }
+
+          console.log("Incrementando clics para:", alias);
           await updateDoc(ref, {
             clicks: (data.clicks || 0) + 1
           });
-          // Redirigir
-          window.location.href = data.longUrl;
+
+          console.log("Redirigiendo a:", longUrl);
+          window.location.href = longUrl; // Redirección inmediata
         } else {
-          document.getElementById('errorMessage').textContent = 'URL no encontrada.';
-          document.getElementById('errorMessage').style.display = 'block';
+          console.error("Documento no encontrado para alias:", alias);
+          errorMessage.textContent = 'URL no encontrada.';
+          errorMessage.style.display = 'block';
         }
       } catch (error) {
-        console.error("Error al redirigir:", error);
-        document.getElementById('errorMessage').textContent = 'Error al redirigir. Intenta de nuevo.';
-        document.getElementById('errorMessage').style.display = 'block';
+        console.error("Error al redirigir:", error.code, error.message);
+        errorMessage.textContent = `Error al redirigir: ${error.message}`;
+        errorMessage.style.display = 'block';
       }
     }
 
