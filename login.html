@@ -109,23 +109,27 @@
     <div id="errorMessage" class="error-message"></div>
   </div>
   <script type="module">
-    import { auth } from './js/firebase.js';
-    import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-    // Bandera para evitar redirecciones múltiples
-    let isRedirecting = false;
-
+    console.log("Iniciando script de login.html");
     try {
+      import { auth } from './js/firebase.js';
+      import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+      let isRedirecting = false;
       const provider = new GoogleAuthProvider();
       const googleSignIn = document.getElementById('googleSignIn');
       const errorMessage = document.getElementById('errorMessage');
 
-      // Depuración inicial
-      console.log("Script de login.html cargado. Botón googleSignIn:", googleSignIn);
+      console.log("googleSignIn button:", googleSignIn);
 
-      // Verificar estado de autenticación
+      if (!googleSignIn) {
+        console.error("Botón googleSignIn no encontrado");
+        errorMessage.textContent = "Error: Botón de inicio de sesión no encontrado";
+        errorMessage.style.display = 'block';
+        return;
+      }
+
       onAuthStateChanged(auth, (user) => {
-        console.log("onAuthStateChanged en login.html, usuario:", user);
+        console.log("onAuthStateChanged ejecutado, usuario:", user);
         if (isRedirecting) return;
 
         if (user) {
@@ -135,26 +139,27 @@
         }
       });
 
-      // Iniciar sesión con Google
       googleSignIn.addEventListener('click', async (event) => {
-        console.log("Botón de Google Sign-In clickeado");
+        console.log("Botón de Google Sign-In clickeado", event);
         if (isRedirecting) return;
         isRedirecting = true;
         try {
+          console.log("Iniciando signInWithPopup");
           const result = await signInWithPopup(auth, provider);
           console.log("Inicio de sesión exitoso, usuario:", result.user);
           window.location.href = 'index.html';
         } catch (error) {
           console.error("Error al iniciar sesión:", error.code, error.message);
-          errorMessage.textContent = `Error: ${error.message}`;
+          errorMessage.textContent = `Error al iniciar sesión: ${error.message}`;
           errorMessage.style.display = 'block';
           isRedirecting = false;
         }
       });
     } catch (error) {
-      console.error("Error al inicializar Firebase o cargar el script:", error);
-      document.getElementById('errorMessage').textContent = 'Error al cargar la configuración. Contacta al soporte.';
-      document.getElementById('errorMessage').style.display = 'block';
+      console.error("Error al inicializar login.html:", error);
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = `Error al cargar la página: ${error.message}`;
+      errorMessage.style.display = 'block';
     }
   </script>
 </body>
