@@ -96,58 +96,60 @@
     <div id="errorMessage" class="error-message"></div>
     <a href="/index.html" class="btn" id="homeLink" style="display: none;">Volver al inicio</a>
   </div>
+
   <script type="module">
     import { db } from '/js/firebase.js';
-    import { doc, getDoc, updateDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.7.0/firebase-firestore.js";
+    import {
+      doc,
+      getDoc,
+      updateDoc,
+      increment,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/11.7.0/firebase-firestore.js";
 
     const errorMessage = document.getElementById('errorMessage');
     const homeLink = document.getElementById('homeLink');
 
     const pathSegments = window.location.pathname.split('/');
-    const alias = pathSegments[pathSegments.length - 1];
+    const alias = pathSegments[pathSegments.length - 1] || null;
 
     if (!alias || alias === 'redirect.html') {
       errorMessage.textContent = 'URL no válida.';
       errorMessage.style.display = 'block';
       homeLink.style.display = 'block';
-      return;
-    }
+    } else {
+      async function redirect() {
+        try {
+          const ref = doc(db, 'urls', alias);
+          const docSnap = await getDoc(ref);
 
-    async function redirect() {
-      try {
-        const ref = doc(db, 'urls', alias);
-        const docSnap = await getDoc(ref);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            const longUrl = data.longUrl;
 
-        if (docSnap.exists()) {
-          const { longUrl } = docSnap.data();
+            if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
+              throw new Error('La URL destino no es válida.');
+            }
 
-          if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
-            errorMessage.textContent = 'La URL destino no es válida.';
-            errorMessage.style.display = 'block';
-            homeLink.style.display = 'block';
-            return;
+            await updateDoc(ref, {
+              clicks: increment(1),
+              lastAccessed: serverTimestamp()
+            });
+
+            window.location.href = longUrl;
+          } else {
+            throw new Error('URL no encontrada.');
           }
-
-          await updateDoc(ref, {
-            clicks: increment(1),
-            lastAccessed: serverTimestamp()
-          });
-
-          window.location.href = longUrl;
-        } else {
-          errorMessage.textContent = 'URL no encontrada.';
+        } catch (error) {
+          console.error("Error al redirigir:", error);
+          errorMessage.textContent = error.message;
           errorMessage.style.display = 'block';
           homeLink.style.display = 'block';
         }
-      } catch (error) {
-        console.error("Error al redirigir:", error);
-        errorMessage.textContent = `Error al redirigir: ${error.message}`;
-        errorMessage.style.display = 'block';
-        homeLink.style.display = 'block';
       }
-    }
 
-    redirect();
+      redirect();
+    }
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
