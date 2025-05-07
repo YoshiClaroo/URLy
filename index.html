@@ -362,6 +362,12 @@
       color: white;
       border: 1px solid #94a3b8;
     }
+    .error-message {
+      color: var(--error);
+      margin-top: 20px;
+      display: none;
+      text-align: center;
+    }
     @media (max-width: 768px) {
       .form-row {
         flex-direction: column;
@@ -455,6 +461,7 @@
           <i class="fas fa-link"></i>
           Acortar URL
         </button>
+        <div id="errorMessage" class="error-message"></div>
         <div id="resultContainer" class="result-container">
           <div class="result-row">
             <div class="result-label">URL acortada:</div>
@@ -501,6 +508,7 @@
   </div>
   <script type="module">
     try {
+      console.log("Script de index.html cargado");
       import { auth, db } from './js/firebase.js';
       import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
       import { doc, getDoc, setDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
@@ -508,9 +516,9 @@
       // Bandera para evitar redirecciones múltiples
       let isRedirecting = false;
 
-      // Esperar a que Firebase inicialice el estado de autenticación
+      // Verificar autenticación
       onAuthStateChanged(auth, (user) => {
-        console.log("onAuthStateChanged ejecutado en index.html, usuario:", user);
+        console.log("onAuthStateChanged ejecutado, usuario:", user);
         if (isRedirecting) return;
 
         if (user) {
@@ -529,16 +537,21 @@
 
       // Configurar botón de cerrar sesión
       const signOutBtn = document.getElementById('signOutBtn');
-      signOutBtn.addEventListener('click', () => {
+      console.log("signOutBtn:", signOutBtn);
+      signOutBtn.addEventListener('click', async () => {
+        console.log("Botón de cerrar sesión clickeado");
         if (isRedirecting) return;
         isRedirecting = true;
-        signOut(auth).then(() => {
+        try {
+          await signOut(auth);
           console.log("Sesión cerrada, redirigiendo a login.html");
           window.location.href = 'login.html';
-        }).catch((error) => {
-          console.error("Error al cerrar sesión:", error);
+        } catch (error) {
+          console.error("Error al cerrar sesión:", error.code, error.message);
+          document.getElementById('errorMessage').textContent = `Error al cerrar sesión: ${error.message}`;
+          document.getElementById('errorMessage').style.display = 'block';
           isRedirecting = false;
-        });
+        }
       });
 
       // Manejo de cookies
@@ -546,10 +559,12 @@
         document.getElementById('cookie-banner').style.display = 'block';
       }
       document.getElementById('acceptCookies').addEventListener('click', () => {
+        console.log("Cookies aceptadas");
         localStorage.setItem('cookies-accepted', 'true');
         document.getElementById('cookie-banner').style.display = 'none';
       });
       document.getElementById('declineCookies').addEventListener('click', () => {
+        console.log("Cookies rechazadas");
         localStorage.setItem('cookies-accepted', 'false');
         document.getElementById('cookie-banner').style.display = 'none';
       });
@@ -557,6 +572,7 @@
       // Cargar estadísticas
       async function loadStats(userId) {
         try {
+          console.log("Cargando estadísticas para userId:", userId);
           const q = query(collection(db, 'urls'), where('userId', '==', userId));
           const querySnapshot = await getDocs(q);
           let totalClicks = 0;
@@ -567,6 +583,8 @@
           document.getElementById('totalVisits').textContent = totalClicks;
         } catch (error) {
           console.error("Error al cargar estadísticas:", error);
+          document.getElementById('errorMessage').textContent = `Error al cargar estadísticas: ${error.message}`;
+          document.getElementById('errorMessage').style.display = 'block';
         }
       }
 
@@ -577,31 +595,39 @@
       const resultContainer = document.getElementById("resultContainer");
       const shortUrlElement = document.getElementById("shortUrl");
       const copyBtn = document.getElementById("copyBtn");
+      const errorMessage = document.getElementById("errorMessage");
 
+      console.log("shortenBtn:", shortenBtn);
       shortenBtn.addEventListener("click", async () => {
+        console.log("Botón de acortar URL clickeado");
         const longUrl = longUrlInput.value.trim();
         const alias = aliasInput.value.trim();
 
         // Validar longUrl
         if (!longUrl || !/^https?:\/\/[^\s$.?#].[^\s]*$/i.test(longUrl)) {
-          alert("Por favor ingresa una URL válida (por ejemplo, https://ejemplo.com)");
+          errorMessage.textContent = "Por favor ingresa una URL válida (por ejemplo, https://ejemplo.com)";
+          errorMessage.style.display = 'block';
           return;
         }
 
-        // Validar alias (si se proporciona)
+        // Validar alias
         if (alias && !/^[a-zA-Z0-9_-]+$/.test(alias)) {
-          alert("El alias solo puede contener letras, números, guiones y guiones bajos.");
+          errorMessage.textContent = "El alias solo puede contener letras, números, guiones y guiones bajos";
+          errorMessage.style.display = 'block';
           return;
         }
 
         const shortId = alias || Math.random().toString(36).substring(2, 8);
         const ref = doc(db, "urls", shortId);
         try {
+          console.log("Verificando si el alias existe:", shortId);
           if ((await getDoc(ref)).exists()) {
-            alert("¡Este alias ya está en uso!");
+            errorMessage.textContent = "¡Este alias ya está en uso!";
+            errorMessage.style.display = 'block';
             return;
           }
 
+          console.log("Creando URL acortada:", { longUrl, shortId });
           await setDoc(ref, {
             longUrl,
             clicks: 0,
@@ -611,7 +637,10 @@
           const shortUrl = `${window.location.origin}/r/${shortId}`;
           shortUrlElement.innerHTML = `<a href="${shortUrl}" target="_blank">${shortUrl}</a>`;
           resultContainer.style.display = 'block';
+          errorMessage.style.display = 'none';
+
           copyBtn.onclick = () => {
+            console.log("Copiando URL:", shortUrl);
             navigator.clipboard.writeText(shortUrl);
             copyBtn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
             setTimeout(() => {
@@ -620,12 +649,15 @@
           };
           loadStats(auth.currentUser.uid);
         } catch (error) {
-          console.error("Error al crear URL acortada:", error);
-          alert("Error al crear la URL. Intenta de nuevo.");
+          console.error("Error al acortar URL:", error.code, error.message);
+          errorMessage.textContent = `Error al acortar URL: ${error.message}`;
+          errorMessage.style.display = 'block';
         }
       });
     } catch (error) {
-      console.error("Error al cargar firebase.js o inicializar Firebase:", error);
+      console.error("Error al inicializar script de index.html:", error);
+      document.getElementById('errorMessage').textContent = `Error al cargar la página: ${error.message}`;
+      document.getElementById('errorMessage').style.display = 'block';
       if (!isRedirecting) {
         isRedirecting = true;
         window.location.href = 'login.html';
@@ -633,4 +665,4 @@
     }
   </script>
 </body>
-        </html>
+</html>
