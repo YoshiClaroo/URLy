@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-adsense-account" content="ca-pub-3539363562189833">
+  <title>Redirigiendo... | URLy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --secondary: #e0e7ff;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .redirect-container {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .logo-icon {
+      color: var(--primary);
+      font-size: 32px;
+    }
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+    }
+    p {
+      color: var(--gray);
+      margin-bottom: 20px;
+    }
+    .error-message {
+      color: var(--error);
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="redirect-container">
+    <div class="logo">
+      <i class="fas fa-link logo-icon"></i>
+      <span class="logo-text">URLy</span>
+    </div>
+    <h1>Redirigiendo...</h1>
+    <p>Por favor espera un momento.</p>
+    <div id="errorMessage" class="error-message"></div>
+  </div>
+  <script type="module">
+    import { db } from './js/firebase.js';
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const alias = params.get('alias');
+    const errorMessage = document.getElementById('errorMessage');
+
+    if (!alias) {
+      errorMessage.textContent = 'URL no válida.';
+      errorMessage.style.display = 'block';
+      return;
+    }
+
+    async function redirect() {
+      try {
+        console.log("Buscando documento con alias:", alias);
+        const ref = doc(db, 'urls', alias);
+        const docSnap = await getDoc(ref);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const longUrl = data.longUrl;
+
+          if (!longUrl || !/^https?:\/\//i.test(longUrl)) {
+            console.error("URL inválida:", longUrl);
+            errorMessage.textContent = 'La URL destino no es válida.';
+            errorMessage.style.display = 'block';
+            return;
+          }
+
+          console.log("Incrementando clics para:", alias);
+          await updateDoc(ref, {
+            clicks: (data.clicks || 0) + 1
+          });
+
+          console.log("Redirigiendo a:", longUrl);
+          window.location.href = longUrl; // Redirección inmediata
+        } else {
+          console.error("Documento no encontrado para alias:", alias);
+          errorMessage.textContent = 'URL no encontrada.';
+          errorMessage.style.display = 'block';
+        }
+      } catch (error) {
+        console.error("Error al redirigir:", error.code, error.message);
+        errorMessage.textContent = `Error al redirigir: ${error.message}`;
+        errorMessage.style.display = 'block';
+      }
+    }
+
+    redirect();
+  </script>
+</body>
+  </html>
