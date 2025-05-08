@@ -304,8 +304,14 @@
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
-      clearInterval(countdownInterval);
+      // Abre tu smartlink de Adsterra en nueva pestaña
+      window.open('https://www.profitableratecpm.com/ftar4su59b?key=3591944d010abedf0cc58890c851c93e', '_blank');
+      
+      // Redirige inmediatamente después
       window.location.href = redirectUrl;
+      
+      // Opcional: Registra esta acción en tus analytics
+      console.log('Usuario usó skip con anuncio para:', alias);
     });
 
     // Iniciar proceso solo si no es un bot
