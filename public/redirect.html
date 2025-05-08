@@ -87,6 +87,47 @@
 </head>
 <body>
 
+  <!-- Contenedor de In-Page Push Notification -->
+<div id="ipp-container" style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 300px;
+    max-width: 90%;
+    z-index: 9999;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    display: none; /* Oculto inicialmente */
+">
+    <!-- El anuncio se cargará aquí dinámicamente -->
+</div>
+
+<script>
+// Código del In-Page Push con retraso para mejor UX
+window.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        var ippScript = function(tiz) {
+            var d = document,
+                s = d.createElement('script'),
+                l = d.scripts[d.scripts.length - 1];
+            s.settings = tiz || {};
+            s.src = "//shamelesscredit.com/bAXHVhs.dSG-lP0AYHWIcM/ke/mF9RuVZVUul/k/PITDYWzeMHz/YmwYM/jXkbtoNrjIMRzgNXjPA/zyMtAN";
+            s.async = true;
+            s.referrerPolicy = 'no-referrer-when-downgrade';
+            l.parentNode.insertBefore(s, l);
+        };
+        ippScript({});
+        
+        // Mostrar el contenedor después de 5 segundos (ajustable)
+        setTimeout(function() {
+            document.getElementById('ipp-container').style.display = 'block';
+        }, 5000);
+    }, 1000);
+});
+</script>
+
   <!-- Barra Social Adsterra -->
   <script type='text/javascript' src='//pl26541134.profitableratecpm.com/97/d1/4d/97d14d2941ec5522e990126cd17e68dc.js'></script>
   
