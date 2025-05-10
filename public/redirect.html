@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex">
   <meta name="referrer" content="no-referrer-when-downgrade">
   <title>Redirigiendo... | URLy</title>
-  <link rel="preconnect" href="https://www.highperformanceformat.com">
-  <link rel="preconnect" href="https://pl26541134.profitableratecpm.com">
+  <link rel="preconnect" href="https://silky-letter.com">
+  <link rel="preconnect" href="https://adoto.net">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -20,7 +20,8 @@
       --gray: #64748b;
       --success: #10b981;
       --error: #ef4444;
-      --premium: #f1c40f;
+      --premium: #FF512F;
+      --premium-gradient: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
     }
     * {
       box-sizing: border-box;
@@ -36,6 +37,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      padding-bottom: 80px;
     }
     .redirect-container {
       text-align: center;
@@ -45,6 +47,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       max-width: 800px;
       width: 95%;
+      margin-top: 40px;
     }
     .logo {
       display: flex;
@@ -78,7 +81,7 @@
       background: var(--primary);
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
@@ -86,17 +89,19 @@
       text-decoration: none;
       display: inline-block;
       transition: all 0.3s ease;
+      font-weight: bold;
     }
     .btn:hover {
       background: var(--primary-dark);
     }
     .btn-premium {
-      background: var(--premium);
-      color: #000;
-      font-weight: bold;
+      background: var(--premium-gradient);
+      color: white;
+      box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
+      animation: pulse 1.5s infinite;
     }
     .btn-premium:hover {
-      background: #f39c12;
+      opacity: 0.9;
     }
     .countdown {
       font-size: 24px;
@@ -110,42 +115,64 @@
       overflow: hidden;
       background: #f5f5f5;
       border-radius: 8px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .skip-options {
       margin: 15px 0;
     }
-    #social-bar {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 9998;
-    }
-    #native-ad-container {
-      margin: 20px auto;
-      min-height: 100px;
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Barra Social -->
-  <div id="social-bar">
-    <script type='text/javascript' src='//pl26541134.profitableratecpm.com/97/d1/4d/97d14d2941ec5522e990126cd17e68dc.js'></script>
+  <!-- DirectLink de HilltopAds (Oculto, se usará en el botón) -->
+  <div id="hilltop-directlink" style="display:none;">
+    <a href="https://silky-letter.com/pvwaPx" target="_blank" id="directlink-trigger"></a>
   </div>
-  
+
+  <!-- Video Slider de HilltopAds -->
+  <script>
+    (function(ydcm){
+      var d = document,
+          s = d.createElement('script'),
+          l = d.scripts[d.scripts.length - 1];
+      s.settings = ydcm || {};
+      s.src = "//shamelesscredit.com/biXiVzs.d/G/lF0_YuWBcZ/_ejm/9TuGZNUYlNkHPUT/YWzpMyzQkZxIOHDdAqtIN/jpM/zSOrTLEb4CM/Q-";
+      s.async = true;
+      s.referrerPolicy = 'no-referrer-when-downgrade';
+      l.parentNode.insertBefore(s, l);
+    })({})
+  </script>
+
+  <!-- Popunder de HilltopAds (Se activará con delay) -->
+  <div id="hilltop-popunder" style="display:none;">
+    <script>
+      (function(akvdv){
+        var d = document,
+            s = d.createElement('script'),
+            l = d.scripts[d.scripts.length - 1];
+        s.settings = akvdv || {};
+        s.src = "//silky-letter.com/c.DB9l6jbL2U5hltSHWdQ/9UN/jFMMzPO/TwE/5-M/C/0K2MMpzmMg5EMDT/kbxT";
+        s.async = true;
+        s.referrerPolicy = 'no-referrer-when-downgrade';
+        l.parentNode.insertBefore(s, l);
+      })({})
+    </script>
+  </div>
+
   <div class="redirect-container">
-    <!-- Banner Superior (728x90) -->
-    <div class="ad-container" style="min-height: 90px;">
-      <script type="text/javascript">
-        atOptions = {
-          'key' : 'e74f443ad56eb84e392bc28ed32c9236',
-          'format' : 'iframe',
-          'height' : 90,
-          'width' : 728,
-          'params' : {}
-        };
-      </script>
-      <script type="text/javascript" src="//www.highperformanceformat.com/e74f443ad56eb84e392bc28ed32c9236/invoke.js"></script>
+    <!-- Banner 728x90 de Adoto -->
+    <div class="ad-container" style="min-height:90px;">
+      <div id="adm-container-7268"></div>
+      <script data-cfasync="false" async type="text/javascript" src="//adoto.net/dashboard/display/items.php?7268&3085&728&90&4&0&0"></script>
+      <script data-cfasync="false" type="text/javascript" src="//adoto.net/dashboard/display/serve.js"></script>
     </div>
 
     <div class="logo">
@@ -153,20 +180,20 @@
       <span class="logo-text">URLy</span>
     </div>
     
-    <!-- Banner Nativo -->
-    <div id="native-ad-container">
-      <script async="async" data-cfasync="false" src="//pl26540266.profitableratecpm.com/a89ccb1c4806b9ebe69e94dd89d8a503/invoke.js"></script>
-      <div id="container-a89ccb1c4806b9ebe69e94dd89d8a503"></div>
+    <!-- Banner 300x250 de Adoto -->
+    <div class="ad-container" style="min-height:250px; margin:20px auto;">
+      <div id="adm-container-7267"></div>
+      <script data-cfasync="false" async type="text/javascript" src="//adoto.net/dashboard/display/items.php?7267&3085&300&250&4&0&0"></script>
+      <script data-cfasync="false" type="text/javascript" src="//adoto.net/dashboard/display/serve.js"></script>
     </div>
     
     <h1>Redirigiendo...</h1>
     <div class="countdown" id="countdown">10</div>
     <p>Serás redirigido automáticamente en <span id="seconds">10</span> segundos</p>
     
-    <!-- Opciones para saltar espera -->
     <div class="skip-options">
       <button id="skipAdBtn" class="btn btn-premium" style="display: none;">
-        <i class="fas fa-bolt"></i> Saltar espera (Ver anuncio)
+        🔥 ¡Saltar AHORA! +50% Rápido
       </button>
       <button id="skipBtn" class="btn" style="display: none; margin-left: 10px;">
         <i class="fas fa-forward"></i> Continuar sin anuncio
@@ -175,11 +202,6 @@
     
     <div id="errorMessage" class="error-message"></div>
     <a href="/index.html" class="btn" id="homeLink" style="display: none;">Volver al inicio</a>
-    
-    <!-- Banner Inferior (300x250) -->
-    <div class="ad-container" style="min-height: 250px; margin: 20px auto 10px;">
-    <div id="adm-container-7267"></div><script data-cfasync="false" async type="text/javascript" src="//adoto.net/dashboard/display/items.php?7267&3085&300&250&4&0&0"></script><script data-cfasync="false" type="text/javascript" src="//adoto.net/dashboard/display/serve.js"></script>
-    </div>
   </div>
 
   <script type="module">
@@ -199,13 +221,13 @@
     const secondsElement = document.getElementById('seconds');
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
+    const directlinkTrigger = document.getElementById('directlink-trigger');
 
     // Variables globales
     let countdownInterval;
     let redirectUrl = '';
-    let alias = '';
     const pathSegments = window.location.pathname.split('/');
-    alias = pathSegments[pathSegments.length - 1] || null;
+    const alias = pathSegments[pathSegments.length - 1] || null;
 
     // Función para detectar bots
     function isBot() {
@@ -215,7 +237,8 @@
     // Función de redirección principal
     async function redirect() {
       if (!alias || alias === 'redirect.html') {
-        throw new Error('URL no válida.');
+        showError('URL no válida.');
+        return;
       }
 
       try {
@@ -233,20 +256,15 @@
           throw new Error('La URL destino no es válida.');
         }
 
-        // Actualizar estadísticas en Firebase
         await updateDoc(ref, {
           clicks: increment(1),
           lastAccessed: serverTimestamp()
         });
 
-        // Iniciar cuenta regresiva
         startCountdown();
       } catch (error) {
+        showError(error.message);
         console.error("Error al redirigir:", error);
-        errorMessage.textContent = error.message;
-        errorMessage.style.display = 'block';
-        homeLink.style.display = 'block';
-        clearInterval(countdownInterval);
       }
     }
 
@@ -265,9 +283,9 @@
           skipBtn.style.display = 'inline-block';
         }
         
-        // Cargar popunder a los 5 segundos
+        // Activar Popunder a los 5 segundos
         if (seconds === 5 && !isBot()) {
-          loadPopunder();
+          document.getElementById('hilltop-popunder').style.display = 'block';
         }
         
         // Redireccionar al finalizar
@@ -278,31 +296,17 @@
       }, 1000);
     }
 
-    // Función para cargar popunder
-    function loadPopunder() {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = '//pl26597084.profitableratecpm.com/d9/f0/9b/d9f09b248952730a98d7e0674baf8061.js';
-      document.body.appendChild(script);
-    }
-
-    // Evento para saltar con anuncio
+    // Evento para saltar con anuncio (DirectLink HilltopAds)
     skipAdBtn.addEventListener('click', () => {
       clearInterval(countdownInterval);
-      // Aquí puedes cargar un anuncio adicional si lo deseas
+      directlinkTrigger.click(); // Activa el DirectLink
       window.location.href = redirectUrl;
     });
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
-      // Abre tu smartlink de Adsterra en nueva pestaña
-      window.open('https://www.profitableratecpm.com/ftar4su59b?key=3591944d010abedf0cc58890c851c93e', '_blank');
-      
-      // Redirige inmediatamente después
+      clearInterval(countdownInterval);
       window.location.href = redirectUrl;
-      
-      // Opcional: Registra esta acción en tus analytics
-      console.log('Usuario usó skip con anuncio para:', alias);
     });
 
     // Iniciar proceso solo si no es un bot
