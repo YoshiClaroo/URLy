@@ -8,7 +8,7 @@
   <meta name="ppck-ver" content="80242278b27a21f17c6fa3fd38b70354" />
   <script async src="https://ss.mrmnd.com/banner.js"></script>
   <script async src="https://ss.mrmnd.com/native.js"></script>
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer onload="recaptchaLoaded()" onerror="recaptchaError()"></script>
   <title>Redirigiendo... | URLy</title>
   <link rel="preconnect" href="https://profitableratecpm.com">
   <link rel="preconnect" href="https://adoto.net">
@@ -216,7 +216,7 @@
         <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
       </div>
       <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
-      <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAOWJQy0RGDg4cznflxHJV6YMduf7" data-callback="captchaVerificado"></div>
+      <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado"></div>
       <div id="captchaError" class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
@@ -283,6 +283,17 @@
     let redirectUrl = '';
     const pathSegments = window.location.pathname.split('/');
     const alias = pathSegments[pathSegments.length - 1] || null;
+
+    // Depuración de reCAPTCHA
+    function recaptchaLoaded() {
+      console.log('reCAPTCHA script cargado correctamente');
+      console.log('Dominio actual:', window.location.hostname);
+      console.log('URL completa:', window.location.href);
+    }
+    function recaptchaError() {
+      console.error('Error cargando reCAPTCHA script');
+      captchaError.textContent = 'Error al cargar reCAPTCHA. Intenta de nuevo.';
+    }
 
     // Función para detectar bots
     function isBot() {
@@ -352,18 +363,19 @@
 
     // Verificar CAPTCHA
     async function captchaVerificado(token) {
-      console.log('Verificando CAPTCHA');
+      console.log('Verificando CAPTCHA, token:', token);
       try {
-        const response = await fetch('/verificar-captcha', {
+        const response = await fetch('/.netlify/functions/verificar-captcha', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token })
         });
         const data = await response.json();
+        console.log('Respuesta de verificación:', data);
         if (data.success) {
           mostrarPantalla3();
         } else {
-          captchaError.textContent = 'Error en la verificación del CAPTCHA. Intenta de nuevo.';
+          captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
         }
       } catch (error) {
         captchaError.textContent = 'Error del servidor. Intenta de nuevo.';
@@ -423,7 +435,7 @@
 
     // Iniciar proceso
     async function init() {
-      console.log('Iniciando aplicación');
+      console.log('Iniciando aplicación, dominio:', window.location.hostname, 'ruta:', window.location.pathname);
       if (isBot()) {
         console.log('Bot detectado');
         pantalla1.style.display = 'none';
@@ -448,4 +460,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
