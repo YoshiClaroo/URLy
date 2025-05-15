@@ -167,8 +167,18 @@
   <script type="text/javascript">
     var uid = '489841';
     var wid = '739653';
-    var pop_tag = document.createElement('script');pop_tag.src='//cdn.popcash.net/show.js';document.body.appendChild(pop_tag);
-    pop_tag.onerror = function() {pop_tag = document.createElement('script');pop_tag.src='//cdn2.popcash.net/show.js';document.body.appendChild(pop_tag)};
+    function loadPopunder() {
+      console.log('Cargando popunder');
+      var pop_tag = document.createElement('script');
+      pop_tag.src = '//cdn.popcash.net/show.js';
+      pop_tag.onerror = function() {
+        console.log('Error cargando popunder, intentando respaldo');
+        var backup_tag = document.createElement('script');
+        backup_tag.src = '//cdn2.popcash.net/show.js';
+        document.body.appendChild(backup_tag);
+      };
+      document.body.appendChild(pop_tag);
+    }
   </script>
 
   <!-- Barra Social de Adsterra -->
@@ -177,58 +187,54 @@
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
     <div id="pantalla1">
-      <!-- Banner 728x90 de Adoto -->
-      <div class="ad-container">
-        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
-      </div>
-      <!-- Banner 300x250 de Adoto -->
-      <div class="ad-container ad-container-300x250">
-        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
-      </div>
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
       <h1>Espere, por favor</h1>
+      <!-- Banner 728x90 arriba -->
+      <div class="ad-container">
+        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
+      </div>
       <p>Preparando tu enlace en <span id="countdown1">5</span> segundos...</p>
       <button id="btnContinuar" class="btn" disabled>Continuar</button>
+      <!-- Banner 300x250 debajo -->
+      <div class="ad-container ad-container-300x250">
+        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
+      </div>
     </div>
 
     <!-- Pantalla 2: Verificación CAPTCHA -->
     <div id="pantalla2" style="display: none;">
-      <!-- Banner 728x90 de Adoto -->
-      <div class="ad-container">
-        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
-      </div>
-      <!-- Banner 300x250 de Adoto -->
-      <div class="ad-container ad-container-300x250">
-        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
-      </div>
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
       <h1>Verifica que no eres un robot</h1>
+      <!-- Banner 728x90 arriba -->
+      <div class="ad-container">
+        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
+      </div>
       <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
       <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAOWJQy0RGDg4cznflxHJV6YMduf7" data-callback="captchaVerificado"></div>
       <div id="captchaError" class="error-message"></div>
+      <!-- Banner 300x250 debajo -->
+      <div class="ad-container ad-container-300x250">
+        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
+      </div>
     </div>
 
     <!-- Pantalla 3: Generando URL -->
     <div id="pantalla3" style="display: none;">
-      <!-- Banner 728x90 de Adoto -->
-      <div class="ad-container">
-        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
-      </div>
-      <!-- Banner 300x250 de Adoto -->
-      <div class="ad-container ad-container-300x250">
-        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
-      </div>
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
       <h1>¡Enlace listo!</h1>
+      <!-- Banner 728x90 arriba -->
+      <div class="ad-container">
+        <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
+      </div>
       <p>Continúa en <span id="countdown3">5</span> segundos...</p>
       <div class="skip-options">
         <button id="skipAdBtn" class="btn btn-premium" disabled>
@@ -237,6 +243,10 @@
         <button id="skipBtn" class="btn" style="margin-left: 10px;" disabled>
           <i class="fas fa-forward"></i> Continuar sin anuncio
         </button>
+      </div>
+      <!-- Banner 300x250 debajo -->
+      <div class="ad-container ad-container-300x250">
+        <div data-mndbanid="452f12f9-db7f-4ecf-9949-68991c7116c3"></div>
       </div>
     </div>
 
@@ -298,7 +308,7 @@
 
     // Mostrar pantalla 2 (CAPTCHA)
     function mostrarPantalla2() {
-      console.log('Mostrando pantalla 2'); // Depuración
+      console.log('Mostrando pantalla 2');
       if (!pantalla1 || !pantalla2) {
         console.error('Error: pantalla1 o pantalla2 no encontrados');
         errorMessage.textContent = 'Error interno. Intenta de nuevo.';
@@ -314,7 +324,7 @@
 
     // Mostrar pantalla 3 (Generando URL)
     function mostrarPantalla3() {
-      console.log('Mostrando pantalla 3'); // Depuración
+      console.log('Mostrando pantalla 3');
       if (!pantalla2 || !pantalla3) {
         console.error('Error: pantalla2 o pantalla3 no encontrados');
         errorMessage.textContent = 'Error interno. Intenta de nuevo.';
@@ -325,13 +335,14 @@
       startCountdown(countdown3, skipBtn, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
+        loadPopunder(); // Activar popunder
       });
       startCountdown(countdown3, skipAdBtn);
     }
 
     // Mostrar error
     function showError(message) {
-      console.error('Error:', message); // Depuración
+      console.error('Error:', message);
       errorMessage.textContent = message;
       homeLink.style.display = 'inline-block';
       pantalla1.style.display = 'none';
@@ -341,7 +352,7 @@
 
     // Verificar CAPTCHA
     async function captchaVerificado(token) {
-      console.log('Verificando CAPTCHA'); // Depuración
+      console.log('Verificando CAPTCHA');
       try {
         const response = await fetch('/verificar-captcha', {
           method: 'POST',
@@ -362,7 +373,7 @@
 
     // Función para obtener la URL y registrar clics
     async function fetchUrlAndTrack() {
-      console.log('Iniciando fetchUrlAndTrack, alias:', alias); // Depuración
+      console.log('Iniciando fetchUrlAndTrack, alias:', alias);
       if (!alias || alias === 'redirect.html') {
         showError('URL no válida.');
         return false;
@@ -388,7 +399,7 @@
           lastAccessed: serverTimestamp()
         });
 
-        console.log('URL obtenida:', redirectUrl); // Depuración
+        console.log('URL obtenida:', redirectUrl);
         return true;
       } catch (error) {
         showError(error.message);
@@ -399,22 +410,22 @@
 
     // Evento para saltar con anuncio (DirectLink Adsterra)
     skipAdBtn.addEventListener('click', () => {
-      console.log('Clic en Saltar ahora'); // Depuración
-      directlinkTrigger.click(); // Activa el DirectLink
+      console.log('Clic en Saltar ahora');
+      directlinkTrigger.click();
       window.location.href = redirectUrl;
     });
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
-      console.log('Clic en Continuar sin anuncio'); // Depuración
+      console.log('Clic en Continuar sin anuncio');
       window.location.href = redirectUrl;
     });
 
     // Iniciar proceso
     async function init() {
-      console.log('Iniciando aplicación'); // Depuración
+      console.log('Iniciando aplicación');
       if (isBot()) {
-        console.log('Bot detectado'); // Depuración
+        console.log('Bot detectado');
         pantalla1.style.display = 'none';
         errorMessage.textContent = 'Redirección en progreso...';
         setTimeout(() => {
@@ -425,9 +436,7 @@
 
       const success = await fetchUrlAndTrack();
       if (success) {
-        // Iniciar contador para pantalla 1
         startCountdown(countdown1, btnContinuar);
-        // Registrar evento del botón
         btnContinuar.addEventListener('click', mostrarPantalla2);
       }
     }
