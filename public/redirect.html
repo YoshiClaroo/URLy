@@ -217,7 +217,7 @@
       </div>
       <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
       <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado"></div>
-      <button id="btnIrAPagina3" class="btn" style="display: none; margin-top: 15px;">Continuar a página 3</button>
+      <button id="btnIrAPagina3" class="btn" style="display: none; margin-top: 15px;">Continuar</button>
       <div id="captchaError" class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
@@ -378,7 +378,12 @@
           // Mostrar y activar el botón para ir a página 3
           btnIrAPagina3.style.display = 'inline-block';
           btnIrAPagina3.disabled = false;
+          btnIrAPagina3.style.opacity = '1';
           captchaError.textContent = '';
+          
+          // Activar visualmente el recaptcha
+          const recaptcha = document.querySelector('.g-recaptcha');
+          if (recaptcha) recaptcha.classList.add('active');
         } else {
           captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
         }
@@ -468,4 +473,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
