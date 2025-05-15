@@ -217,6 +217,7 @@
       </div>
       <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
       <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado"></div>
+      <button id="btnIrAPagina3" class="btn" style="display: none; margin-top: 15px;">Continuar a página 3</button>
       <div id="captchaError" class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
@@ -274,6 +275,7 @@
     const btnContinuar = document.getElementById('btnContinuar');
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
+    const btnIrAPagina3 = document.getElementById('btnIrAPagina3');
     const directlinkTrigger = document.getElementById('directlink-trigger');
     const pantalla1 = document.getElementById('pantalla1');
     const pantalla2 = document.getElementById('pantalla2');
@@ -373,7 +375,10 @@
         const data = await response.json();
         console.log('Respuesta de verificación:', data);
         if (data.success) {
-          mostrarPantalla3();
+          // Mostrar y activar el botón para ir a página 3
+          btnIrAPagina3.style.display = 'inline-block';
+          btnIrAPagina3.disabled = false;
+          captchaError.textContent = '';
         } else {
           captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
         }
@@ -432,6 +437,9 @@
       console.log('Clic en Continuar sin anuncio');
       window.location.href = redirectUrl;
     });
+
+    // Evento para el botón de ir a página 3
+    btnIrAPagina3.addEventListener('click', mostrarPantalla3);
 
     // Iniciar proceso
     async function init() {
