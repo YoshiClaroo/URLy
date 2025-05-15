@@ -143,6 +143,11 @@
     .g-recaptcha {
       display: inline-block;
       margin: 20px auto;
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+    .g-recaptcha.active {
+      opacity: 1;
     }
   </style>
 </head>
@@ -186,7 +191,7 @@
       </div>
       <h1>Espere, por favor</h1>
       <p>Preparando tu enlace en <span id="countdown1">5</span> segundos...</p>
-      <button id="btnContinuar" class="btn" onclick="mostrarPantalla2()" disabled>Continuar</button>
+      <button id="btnContinuar" class="btn" disabled>Continuar</button>
     </div>
 
     <!-- Pantalla 2: Verificación CAPTCHA -->
@@ -293,15 +298,28 @@
 
     // Mostrar pantalla 2 (CAPTCHA)
     function mostrarPantalla2() {
+      console.log('Mostrando pantalla 2'); // Depuración
+      if (!pantalla1 || !pantalla2) {
+        console.error('Error: pantalla1 o pantalla2 no encontrados');
+        errorMessage.textContent = 'Error interno. Intenta de nuevo.';
+        return;
+      }
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
       startCountdown(countdown2, document.querySelector('.g-recaptcha'), () => {
-        document.querySelector('.g-recaptcha').style.opacity = '1';
+        const recaptcha = document.querySelector('.g-recaptcha');
+        if (recaptcha) recaptcha.classList.add('active');
       });
     }
 
     // Mostrar pantalla 3 (Generando URL)
     function mostrarPantalla3() {
+      console.log('Mostrando pantalla 3'); // Depuración
+      if (!pantalla2 || !pantalla3) {
+        console.error('Error: pantalla2 o pantalla3 no encontrados');
+        errorMessage.textContent = 'Error interno. Intenta de nuevo.';
+        return;
+      }
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
       startCountdown(countdown3, skipBtn, () => {
@@ -313,6 +331,7 @@
 
     // Mostrar error
     function showError(message) {
+      console.error('Error:', message); // Depuración
       errorMessage.textContent = message;
       homeLink.style.display = 'inline-block';
       pantalla1.style.display = 'none';
@@ -322,6 +341,7 @@
 
     // Verificar CAPTCHA
     async function captchaVerificado(token) {
+      console.log('Verificando CAPTCHA'); // Depuración
       try {
         const response = await fetch('/verificar-captcha', {
           method: 'POST',
@@ -342,9 +362,10 @@
 
     // Función para obtener la URL y registrar clics
     async function fetchUrlAndTrack() {
+      console.log('Iniciando fetchUrlAndTrack, alias:', alias); // Depuración
       if (!alias || alias === 'redirect.html') {
         showError('URL no válida.');
-        return;
+        return false;
       }
 
       try {
@@ -367,35 +388,55 @@
           lastAccessed: serverTimestamp()
         });
 
-        // Iniciar contador para pantalla 1
-        startCountdown(countdown1, btnContinuar);
+        console.log('URL obtenida:', redirectUrl); // Depuración
+        return true;
       } catch (error) {
         showError(error.message);
-        console.error("Error al obtener URL:", error);
+        console.error('Error al obtener URL:', error);
+        return false;
       }
     }
 
     // Evento para saltar con anuncio (DirectLink Adsterra)
     skipAdBtn.addEventListener('click', () => {
+      console.log('Clic en Saltar ahora'); // Depuración
       directlinkTrigger.click(); // Activa el DirectLink
       window.location.href = redirectUrl;
     });
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
+      console.log('Clic en Continuar sin anuncio'); // Depuración
       window.location.href = redirectUrl;
     });
 
     // Iniciar proceso
-    if (!isBot()) {
-      fetchUrlAndTrack(); // Obtener URL y registrar clics al cargar
-    } else {
-      pantalla1.style.display = 'none';
-      errorMessage.textContent = 'Redirección en progreso...';
-      setTimeout(() => {
-        window.location.href = '/index.html';
-      }, 3000);
+    async function init() {
+      console.log('Iniciando aplicación'); // Depuración
+      if (isBot()) {
+        console.log('Bot detectado'); // Depuración
+        pantalla1.style.display = 'none';
+        errorMessage.textContent = 'Redirección en progreso...';
+        setTimeout(() => {
+          window.location.href = '/index.html';
+        }, 3000);
+        return;
+      }
+
+      const success = await fetchUrlAndTrack();
+      if (success) {
+        // Iniciar contador para pantalla 1
+        startCountdown(countdown1, btnContinuar);
+        // Registrar evento del botón
+        btnContinuar.addEventListener('click', mostrarPantalla2);
+      }
     }
+
+    // Ejecutar inicialización
+    init().catch(error => {
+      console.error('Error en inicialización:', error);
+      showError('Error al cargar la página. Intenta de nuevo.');
+    });
   </script>
 </body>
 </html>
