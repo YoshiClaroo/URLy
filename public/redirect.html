@@ -107,6 +107,11 @@
     .btn-premium:hover {
       opacity: 0.9;
     }
+    .btn:disabled {
+      background: var(--gray);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
     .countdown {
       font-size: 24px;
       font-weight: bold;
@@ -180,8 +185,8 @@
         <span class="logo-text">URLy</span>
       </div>
       <h1>Espere, por favor</h1>
-      <p>Estamos preparando tu enlace.</p>
-      <button class="btn" onclick="mostrarPantalla2()">Continuar</button>
+      <p>Preparando tu enlace en <span id="countdown1">5</span> segundos...</p>
+      <button id="btnContinuar" class="btn" onclick="mostrarPantalla2()" disabled>Continuar</button>
     </div>
 
     <!-- Pantalla 2: Verificación CAPTCHA -->
@@ -199,7 +204,7 @@
         <span class="logo-text">URLy</span>
       </div>
       <h1>Verifica que no eres un robot</h1>
-      <p>Por favor, completa la verificación para continuar.</p>
+      <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
       <div class="g-recaptcha" data-sitekey="TU_SITE_KEY" data-callback="captchaVerificado"></div>
       <div id="captchaError" class="error-message"></div>
     </div>
@@ -219,13 +224,12 @@
         <span class="logo-text">URLy</span>
       </div>
       <h1>¡Enlace listo!</h1>
-      <div class="countdown" id="countdown">5</div>
-      <p>Haz clic para continuar al enlace.</p>
+      <p>Continúa en <span id="countdown3">5</span> segundos...</p>
       <div class="skip-options">
-        <button id="skipAdBtn" class="btn btn-premium">
+        <button id="skipAdBtn" class="btn btn-premium" disabled>
           🔥 ¡Saltar AHORA! +50% Rápido
         </button>
-        <button id="skipBtn" class="btn" style="margin-left: 10px;">
+        <button id="skipBtn" class="btn" style="margin-left: 10px;" disabled>
           <i class="fas fa-forward"></i> Continuar sin anuncio
         </button>
       </div>
@@ -249,7 +253,10 @@
     const errorMessage = document.getElementById('errorMessage');
     const captchaError = document.getElementById('captchaError');
     const homeLink = document.getElementById('homeLink');
-    const countdownElement = document.getElementById('countdown');
+    const countdown1 = document.getElementById('countdown1');
+    const countdown2 = document.getElementById('countdown2');
+    const countdown3 = document.getElementById('countdown3');
+    const btnContinuar = document.getElementById('btnContinuar');
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
     const directlinkTrigger = document.getElementById('directlink-trigger');
@@ -267,17 +274,41 @@
       return /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
     }
 
+    // Función para iniciar un contador
+    function startCountdown(element, button, callback) {
+      let seconds = 5;
+      element.textContent = seconds;
+      button.disabled = true;
+
+      const interval = setInterval(() => {
+        seconds--;
+        element.textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(interval);
+          button.disabled = false;
+          if (callback) callback();
+        }
+      }, 1000);
+    }
+
     // Mostrar pantalla 2 (CAPTCHA)
     function mostrarPantalla2() {
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
+      startCountdown(countdown2, document.querySelector('.g-recaptcha'), () => {
+        document.querySelector('.g-recaptcha').style.opacity = '1';
+      });
     }
 
     // Mostrar pantalla 3 (Generando URL)
     function mostrarPantalla3() {
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
-      startCountdown();
+      startCountdown(countdown3, skipBtn, () => {
+        skipBtn.disabled = false;
+        skipAdBtn.disabled = false;
+      });
+      startCountdown(countdown3, skipAdBtn);
     }
 
     // Mostrar error
@@ -335,22 +366,13 @@
           clicks: increment(1),
           lastAccessed: serverTimestamp()
         });
+
+        // Iniciar contador para pantalla 1
+        startCountdown(countdown1, btnContinuar);
       } catch (error) {
         showError(error.message);
         console.error("Error al obtener URL:", error);
       }
-    }
-
-    // Función para iniciar el countdown (solo visual, sin redirección automática)
-    function startCountdown() {
-      let seconds = 5;
-      const countdownInterval = setInterval(() => {
-        seconds--;
-        countdownElement.textContent = seconds;
-        if (seconds <= 0) {
-          seconds = 5; // Reinicia el contador para mantenerlo visual
-        }
-      }, 1000);
     }
 
     // Evento para saltar con anuncio (DirectLink Adsterra)
