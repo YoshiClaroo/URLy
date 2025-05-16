@@ -365,32 +365,36 @@
 
     // Verificar CAPTCHA
     async function captchaVerificado(token) {
-      console.log('Verificando CAPTCHA, token:', token);
-      try {
-        const response = await fetch('/.netlify/functions/verificar-captcha', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token })
-        });
-        const data = await response.json();
-        console.log('Respuesta de verificación:', data);
-        if (data.success) {
-          // Mostrar y activar el botón para ir a página 3
-          btnIrAPagina3.style.display = 'inline-block';
-          btnIrAPagina3.disabled = false;
-          btnIrAPagina3.style.opacity = '1';
-          captchaError.textContent = '';
-          
-          // Activar visualmente el recaptcha
-          const recaptcha = document.querySelector('.g-recaptcha');
-          if (recaptcha) recaptcha.classList.add('active');
-        } else {
-          captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
-        }
-      } catch (error) {
-        captchaError.textContent = 'Error del servidor. Intenta de nuevo.';
-        console.error('Error en CAPTCHA:', error);
-      }
+  console.log('Verificando CAPTCHA, token:', token);
+  try {
+    const response = await fetch('/.netlify/functions/verificar-captcha', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token })
+    });
+    const data = await response.json();
+    console.log('Respuesta de verificación:', data);
+    if (data.success) {
+      // Activar y mostrar el botón
+      const btn = document.getElementById('btnIrAPagina3');
+      btn.style.display = 'inline-block';
+      btn.style.visibility = 'visible';
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+      captchaError.textContent = '';
+      
+      // Forzar repintado del DOM
+      void btn.offsetWidth;
+      
+      console.log('CAPTCHA verificado, botón activado');
+    } else {
+      captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
+    }
+  } catch (error) {
+    captchaError.textContent = 'Error del servidor. Intenta de nuevo.';
+    console.error('Error en CAPTCHA:', error);
+  }
     }
 
     // Función para obtener la URL y registrar clics
