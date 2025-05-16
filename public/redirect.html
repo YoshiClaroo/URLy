@@ -8,7 +8,6 @@
   <meta name="ppck-ver" content="80242278b27a21f17c6fa3fd38b70354" />
   <script async src="https://ss.mrmnd.com/banner.js"></script>
   <script async src="https://ss.mrmnd.com/native.js"></script>
-  <script src="https://www.google.com/recaptcha/api.js" async defer onload="recaptchaLoaded()" onerror="recaptchaError()"></script>
   <title>Redirigiendo... | URLy</title>
   <link rel="preconnect" href="https://profitableratecpm.com">
   <link rel="preconnect" href="https://adoto.net">
@@ -149,6 +148,15 @@
     .g-recaptcha.active {
       opacity: 1;
     }
+    #btnIrAPagina3 {
+      transition: all 0.3s ease;
+      will-change: opacity, transform;
+    }
+    #btnIrAPagina3.active {
+      opacity: 1 !important;
+      transform: scale(1.05);
+      display: inline-block !important;
+    }
   </style>
 </head>
 <body>
@@ -184,6 +192,38 @@
   <!-- Barra Social de Adsterra -->
   <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="e8c7fc70-1cbb-4a9b-94aa-48216bb748cd"></script>
 
+  <script>
+    // Función global para el callback del reCAPTCHA
+    function captchaVerificado(token) {
+      console.log('Función captchaVerificado ejecutada con token:', token.substring(0, 10) + '...');
+      try {
+        const btn = document.getElementById('btnIrAPagina3');
+        btn.classList.add('active');
+        btn.style.display = 'inline-block';
+        btn.style.visibility = 'visible';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+        
+        // Forzar redibujado
+        void btn.offsetWidth;
+        
+        console.log('Botón activado con éxito', btn);
+      } catch (error) {
+        console.error('Error en captchaVerificado:', error);
+      }
+    }
+
+    function recaptchaLoaded() {
+      console.log('reCAPTCHA cargado correctamente');
+    }
+
+    function recaptchaError() {
+      console.error('Error cargando reCAPTCHA');
+    }
+  </script>
+  <script src="https://www.google.com/recaptcha/api.js?onload=recaptchaLoaded&render=explicit" async defer></script>
+
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
     <div id="pantalla1">
@@ -216,8 +256,8 @@
         <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
       </div>
       <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
-      <div class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado"></div>
-      <button id="btnIrAPagina3" class="btn" style="display: none; margin-top: 15px;">Continuar</button>
+      <div id="recaptcha-container" class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado" data-size="normal"></div>
+      <button id="btnIrAPagina3" class="btn" style="display: none; visibility: hidden; opacity: 0; pointer-events: none; margin-top: 15px;">Continuar</button>
       <div id="captchaError" class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
@@ -286,17 +326,6 @@
     const pathSegments = window.location.pathname.split('/');
     const alias = pathSegments[pathSegments.length - 1] || null;
 
-    // Depuración de reCAPTCHA
-    function recaptchaLoaded() {
-      console.log('reCAPTCHA script cargado correctamente');
-      console.log('Dominio actual:', window.location.hostname);
-      console.log('URL completa:', window.location.href);
-    }
-    function recaptchaError() {
-      console.error('Error cargando reCAPTCHA script');
-      captchaError.textContent = 'Error al cargar reCAPTCHA. Intenta de nuevo.';
-    }
-
     // Función para detectar bots
     function isBot() {
       return /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
@@ -361,40 +390,6 @@
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'none';
-    }
-
-    // Verificar CAPTCHA
-    async function captchaVerificado(token) {
-  console.log('Verificando CAPTCHA, token:', token);
-  try {
-    const response = await fetch('/.netlify/functions/verificar-captcha', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token })
-    });
-    const data = await response.json();
-    console.log('Respuesta de verificación:', data);
-    if (data.success) {
-      // Activar y mostrar el botón
-      const btn = document.getElementById('btnIrAPagina3');
-      btn.style.display = 'inline-block';
-      btn.style.visibility = 'visible';
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.style.pointerEvents = 'auto';
-      captchaError.textContent = '';
-      
-      // Forzar repintado del DOM
-      void btn.offsetWidth;
-      
-      console.log('CAPTCHA verificado, botón activado');
-    } else {
-      captchaError.textContent = 'Error en la verificación del CAPTCHA: ' + (data.error || 'Intenta de nuevo.');
-    }
-  } catch (error) {
-    captchaError.textContent = 'Error del servidor. Intenta de nuevo.';
-    console.error('Error en CAPTCHA:', error);
-  }
     }
 
     // Función para obtener la URL y registrar clics
@@ -476,5 +471,25 @@
       showError('Error al cargar la página. Intenta de nuevo.');
     });
   </script>
+
+  <!-- Fallback para asegurar que el botón se active -->
+  <script>
+    // Verificación periódica como fallback
+    setInterval(() => {
+      if (typeof grecaptcha !== 'undefined' && 
+          grecaptcha.getResponse().length > 0 && 
+          document.getElementById('btnIrAPagina3').style.display === 'none') {
+        console.log('Fallback: Activando botón manualmente');
+        captchaVerificado(grecaptcha.getResponse());
+      }
+    }, 1000);
+
+    // Resetear CAPTCHA si hay problemas
+    function resetCaptcha() {
+      if (typeof grecaptcha !== 'undefined') {
+        grecaptcha.reset();
+      }
+    }
+  </script>
 </body>
-</html>
+  </html>
