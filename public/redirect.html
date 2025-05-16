@@ -154,22 +154,7 @@
   </div>
 
   <!-- Popunder de Adsterra -->
-  <script type="text/javascript">
-    var uid = '489841';
-    var wid = '739653';
-    function loadPopunder() {
-      console.log('Cargando popunder');
-      var pop_tag = document.createElement('script');
-      pop_tag.src = '//cdn.popcash.net/show.js';
-      pop_tag.onerror = function() {
-        console.log('Error cargando popunder, intentando respaldo');
-        var backup_tag = document.createElement('script');
-        backup_tag.src = '//cdn2.popcash.net/show.js';
-        document.body.appendChild(backup_tag);
-      };
-      document.body.appendChild(pop_tag);
-    }
-  </script>
+  <script async src="https://ss.mrmnd.com/static/f98d2bc4-d24d-4b8e-90f2-4ba56320772a.js"></script>
 
   <!-- Barra Social de Adsterra -->
   <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="e8c7fc70-1cbb-4a9b-94aa-48216bb748cd"></script>
