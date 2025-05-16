@@ -139,24 +139,6 @@
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
-    .g-recaptcha {
-      display: inline-block;
-      margin: 20px auto;
-      opacity: 0.6;
-      transition: opacity 0.3s ease;
-    }
-    .g-recaptcha.active {
-      opacity: 1;
-    }
-    #btnIrAPagina3 {
-      transition: all 0.3s ease;
-      will-change: opacity, transform;
-    }
-    #btnIrAPagina3.active {
-      opacity: 1 !important;
-      transform: scale(1.05);
-      display: inline-block !important;
-    }
   </style>
 </head>
 <body>
@@ -192,38 +174,6 @@
   <!-- Barra Social de Adsterra -->
   <script async src="https://ss.mrmnd.com/interstitial.js" data-mndintid="e8c7fc70-1cbb-4a9b-94aa-48216bb748cd"></script>
 
-  <script>
-    // Función global para el callback del reCAPTCHA
-    function captchaVerificado(token) {
-      console.log('Función captchaVerificado ejecutada con token:', token.substring(0, 10) + '...');
-      try {
-        const btn = document.getElementById('btnIrAPagina3');
-        btn.classList.add('active');
-        btn.style.display = 'inline-block';
-        btn.style.visibility = 'visible';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-        
-        // Forzar redibujado
-        void btn.offsetWidth;
-        
-        console.log('Botón activado con éxito', btn);
-      } catch (error) {
-        console.error('Error en captchaVerificado:', error);
-      }
-    }
-
-    function recaptchaLoaded() {
-      console.log('reCAPTCHA cargado correctamente');
-    }
-
-    function recaptchaError() {
-      console.error('Error cargando reCAPTCHA');
-    }
-  </script>
-  <script src="https://www.google.com/recaptcha/api.js?onload=recaptchaLoaded&render=explicit" async defer></script>
-
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
     <div id="pantalla1">
@@ -244,20 +194,19 @@
       </div>
     </div>
 
-    <!-- Pantalla 2: Verificación CAPTCHA -->
+    <!-- Pantalla 2: Espera -->
     <div id="pantalla2" style="display: none;">
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
-      <h1>Verifica que no eres un robot</h1>
+      <h1>Redireccionando...</h1>
       <!-- Banner 728x90 arriba -->
       <div class="ad-container">
         <div data-mndbanid="55d768a2-2869-4802-94bf-983ea8bdf373"></div>
       </div>
-      <p>Verificación disponible en <span id="countdown2">5</span> segundos...</p>
-      <div id="recaptcha-container" class="g-recaptcha" data-sitekey="6Le0czwrAAAAAJNcwcum_pmq1OkQdv9sM-O3n8xM" data-callback="captchaVerificado" data-size="normal"></div>
-      <button id="btnIrAPagina3" class="btn" style="display: none; visibility: hidden; opacity: 0; pointer-events: none; margin-top: 15px;">Continuar</button>
+      <p>Por favor espere <span id="countdown2">5</span> segundos...</p>
+      <button id="btnIrAPagina3" class="btn" disabled>Continuar</button>
       <div id="captchaError" class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
@@ -348,7 +297,7 @@
       }, 1000);
     }
 
-    // Mostrar pantalla 2 (CAPTCHA)
+    // Mostrar pantalla 2 (Espera)
     function mostrarPantalla2() {
       console.log('Mostrando pantalla 2');
       if (!pantalla1 || !pantalla2) {
@@ -358,9 +307,10 @@
       }
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
-      startCountdown(countdown2, document.querySelector('.g-recaptcha'), () => {
-        const recaptcha = document.querySelector('.g-recaptcha');
-        if (recaptcha) recaptcha.classList.add('active');
+      
+      // Iniciar cuenta regresiva para el botón Continuar
+      startCountdown(countdown2, btnIrAPagina3, () => {
+        console.log('Botón Continuar activado');
       });
     }
 
@@ -471,25 +421,5 @@
       showError('Error al cargar la página. Intenta de nuevo.');
     });
   </script>
-
-  <!-- Fallback para asegurar que el botón se active -->
-  <script>
-    // Verificación periódica como fallback
-    setInterval(() => {
-      if (typeof grecaptcha !== 'undefined' && 
-          grecaptcha.getResponse().length > 0 && 
-          document.getElementById('btnIrAPagina3').style.display === 'none') {
-        console.log('Fallback: Activando botón manualmente');
-        captchaVerificado(grecaptcha.getResponse());
-      }
-    }, 1000);
-
-    // Resetear CAPTCHA si hay problemas
-    function resetCaptcha() {
-      if (typeof grecaptcha !== 'undefined') {
-        grecaptcha.reset();
-      }
-    }
-  </script>
 </body>
-  </html>
+</html>
