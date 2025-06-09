@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex">
   <meta name="referrer" content="no-referrer-when-downgrade"/>
-  <meta name="site-verification" content="f2f28f965b39a1a127800b33c639166c"/>
+  <meta name="ppck-ver" content="80242278b27a21f17c6fa3fd38b70354" />
   <script async src="https://ss.mrmnd.com/banner.js"></script>
   <script async src="https://ss.mrmnd.com/native.js"></script>
   <title>Redirigiendo... | URLy</title>
@@ -145,19 +145,19 @@
   <!-- Dinámica -->
   <script async src="https://ss.mrmnd.com/dynamic.js" data-mnddynid="634b77cf-84a0-477c-a91b-c4ce534e22ff"></script>
 
-  <!-- Push InPage Monetag -->
-  <script src="https://eechicha.com/act/files/tag.min.js?z=9431073" data-cfasync="false" async></script>
+  <!-- Push InPage -->
+  
 
   <!-- DirectLink de Adsterra (Oculto, se usará en el botón) -->
   <div id="adsterra-directlink" style="display:none;">
     
   </div>
 
-  <!-- Popunder de Monetag -->
-  <script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://al5sm.com/tag.min.js',9431067,document.body||document.documentElement)</script>
+  <!-- Popunder de Adsterra -->
+  
 
-  <!-- Intersticial de Monetag-->
-  <script>(function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('groleegni.net',9431214,document.createElement('script'))</script>
+  <!-- Barra Social de Adsterra -->
+  
 
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
@@ -169,13 +169,13 @@
       <h1>Espere, por favor</h1>
       <!-- Banner 728x90 arriba -->
       <div class="ad-container">
-      <div data-mndbanid="b8daec95-d759-4e4e-bf45-f182176c5adc"></div>  
+        
       </div>
       <p>Preparando tu enlace en <span id="countdown1">5</span> segundos...</p>
       <button id="btnContinuar" class="btn" disabled>Continuar</button>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
-      <div data-mndazid="b85553a5-580b-4af4-a9d8-49efdda25b60"></div>  
+        
       </div>
     </div>
 
@@ -188,14 +188,14 @@
       <h1>Redireccionando...</h1>
       <!-- Banner 728x90 arriba -->
       <div class="ad-container">
-      <div data-mndbanid="b8daec95-d759-4e4e-bf45-f182176c5adc"></div>  
+        
       </div>
       <p>Por favor espere <span id="countdown2">5</span> segundos...</p>
       <button id="btnIrAPagina3" class="btn" disabled>Continuar</button>
       <div class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
-      <div data-mndazid="b85553a5-580b-4af4-a9d8-49efdda25b60"></div>  
+        
       </div>
     </div>
 
@@ -208,7 +208,7 @@
       <h1>¡Enlace listo!</h1>
       <!-- Banner 728x90 arriba -->
       <div class="ad-container">
-      <div data-mndbanid="b8daec95-d759-4e4e-bf45-f182176c5adc"></div>  
+        
       </div>
       <p>Continúa en <span id="countdown3">5</span> segundos...</p>
       <div class="skip-options">
@@ -221,7 +221,7 @@
       </div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
-      <div data-mndazid="b85553a5-580b-4af4-a9d8-49efdda25b60"></div>  
+        
       </div>
     </div>
 
@@ -265,16 +265,16 @@
 
     // Función para iniciar un contador
     function startCountdown(element, button, callback) {
-      let seconds = 10;
+      let seconds = 5;
       element.textContent = seconds;
-      if (button) button.disabled = true;
+      button.disabled = true;
 
       const interval = setInterval(() => {
         seconds--;
         element.textContent = seconds;
         if (seconds <= 0) {
           clearInterval(interval);
-          if (button) button.disabled = false;
+          button.disabled = false;
           if (callback) callback();
         }
       }, 1000);
@@ -284,10 +284,8 @@
     function mostrarPantalla2() {
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
-      
-      // Iniciar cuenta regresiva para redirección automática
-      startCountdown(countdown2, null, () => {
-        mostrarPantalla3();
+      startCountdown(countdown2, btnIrAPagina3, () => {
+        console.log('Botón Página 2 activado');
       });
     }
 
@@ -295,7 +293,6 @@
     function mostrarPantalla3() {
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
-      
       startCountdown(countdown3, skipBtn, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
@@ -304,7 +301,6 @@
 
     // Mostrar error
     function showError(message) {
-      console.error('Error:', message);
       errorMessage.textContent = message;
       homeLink.style.display = 'inline-block';
       pantalla1.style.display = 'none';
@@ -349,13 +345,17 @@
 
     // Evento para saltar con anuncio (DirectLink Adsterra)
     skipAdBtn.addEventListener('click', () => {
-      // Aquí deberías incluir tu lógica de anuncios si es necesario
-      window.location.href = redirectUrl;
+      if (redirectUrl) {
+        // Aquí puedes agregar tu lógica de publicidad si es necesario
+        window.location.href = redirectUrl;
+      }
     });
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
-      window.location.href = redirectUrl;
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
     });
 
     // Evento para el botón Continuar en pantalla 1
@@ -378,26 +378,18 @@
       const success = await fetchUrlAndTrack();
       if (success) {
         startCountdown(countdown1, btnContinuar, () => {
-          btnContinuar.disabled = false;
+          console.log('Botón Página 1 activado');
         });
-        
-        // Redirección automática después de todas las pantallas
-        setTimeout(() => {
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          }
-        }, 15000); // 5s pantalla1 + 5s pantalla2 + 5s pantalla3
       }
     }
 
-    // Verificar si Firebase se carga correctamente
+    // Ejecutar inicialización
     if (typeof db !== 'undefined') {
       init().catch(error => {
-        console.error('Error en inicialización:', error);
         showError('Error al cargar la página. Intenta de nuevo.');
       });
     } else {
-      showError('Error al cargar los recursos necesarios. Recarga la página.');
+      showError('Error al cargar los recursos. Recarga la página.');
     }
   </script>
 </body>
