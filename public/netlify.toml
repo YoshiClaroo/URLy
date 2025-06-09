@@ -14,5 +14,11 @@ to = "/index.html"
 status = 200
 force = true
 
+[[redirects]]
+from = "/*"
+to = "/ads.txt"
+status = 200
+force = true
+
 [functions]
 directory = "functions"
