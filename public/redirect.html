@@ -191,8 +191,8 @@
         
       </div>
       <p>Por favor espere <span id="countdown2">5</span> segundos...</p>
-      <button " class="btn" disabled>Continuar</button>
-      <div> " class="error-message"></div>
+      <button id="btnIrAPagina3" class="btn" disabled>Continuar</button>
+      <div class="error-message"></div>
       <!-- Banner 300x250 debajo -->
       <div class="ad-container ad-container-300x250">
         
@@ -241,7 +241,6 @@
 
     // Elementos del DOM
     const errorMessage = document.getElementById('errorMessage');
-    const captchaError = document.getElementById('captchaError');
     const homeLink = document.getElementById('homeLink');
     const countdown1 = document.getElementById('countdown1');
     const countdown2 = document.getElementById('countdown2');
@@ -250,7 +249,6 @@
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
     const btnIrAPagina3 = document.getElementById('btnIrAPagina3');
-    const directlinkTrigger = document.getElementById('directlink-trigger');
     const pantalla1 = document.getElementById('pantalla1');
     const pantalla2 = document.getElementById('pantalla2');
     const pantalla3 = document.getElementById('pantalla3');
@@ -269,14 +267,14 @@
     function startCountdown(element, button, callback) {
       let seconds = 5;
       element.textContent = seconds;
-      button.disabled = true;
+      if (button) button.disabled = true;
 
       const interval = setInterval(() => {
         seconds--;
         element.textContent = seconds;
         if (seconds <= 0) {
           clearInterval(interval);
-          button.disabled = false;
+          if (button) button.disabled = false;
           if (callback) callback();
         }
       }, 1000);
@@ -284,37 +282,24 @@
 
     // Mostrar pantalla 2 (Espera)
     function mostrarPantalla2() {
-      console.log('Mostrando pantalla 2');
-      if (!pantalla1 || !pantalla2) {
-        console.error('Error: pantalla1 o pantalla2 no encontrados');
-        errorMessage.textContent = 'Error interno. Intenta de nuevo.';
-        return;
-      }
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
       
-      // Iniciar cuenta regresiva para el botón Continuar
-      startCountdown(countdown2, btnIrAPagina3, () => {
-        console.log('Botón Continuar activado');
+      // Iniciar cuenta regresiva para redirección automática
+      startCountdown(countdown2, null, () => {
+        mostrarPantalla3();
       });
     }
 
     // Mostrar pantalla 3 (Generando URL)
     function mostrarPantalla3() {
-      console.log('Mostrando pantalla 3');
-      if (!pantalla2 || !pantalla3) {
-        console.error('Error: pantalla2 o pantalla3 no encontrados');
-        errorMessage.textContent = 'Error interno. Intenta de nuevo.';
-        return;
-      }
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
+      
       startCountdown(countdown3, skipBtn, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
-        loadPopunder();
       });
-      startCountdown(countdown3, skipAdBtn);
     }
 
     // Mostrar error
@@ -329,7 +314,6 @@
 
     // Función para obtener la URL y registrar clics
     async function fetchUrlAndTrack() {
-      console.log('Iniciando fetchUrlAndTrack, alias:', alias);
       if (!alias || alias === 'redirect.html') {
         showError('URL no válida.');
         return false;
@@ -355,7 +339,6 @@
           lastAccessed: serverTimestamp()
         });
 
-        console.log('URL obtenida:', redirectUrl);
         return true;
       } catch (error) {
         showError(error.message);
@@ -366,25 +349,24 @@
 
     // Evento para saltar con anuncio (DirectLink Adsterra)
     skipAdBtn.addEventListener('click', () => {
-      console.log('Clic en Saltar ahora');
-      directlinkTrigger.click();
+      // Aquí deberías incluir tu lógica de anuncios si es necesario
       window.location.href = redirectUrl;
     });
 
     // Evento para saltar sin anuncio
     skipBtn.addEventListener('click', () => {
-      console.log('Clic en Continuar sin anuncio');
       window.location.href = redirectUrl;
     });
 
-    // Evento para el botón de ir a página 3
+    // Evento para el botón Continuar en pantalla 1
+    btnContinuar.addEventListener('click', mostrarPantalla2);
+
+    // Evento para el botón Continuar en pantalla 2
     btnIrAPagina3.addEventListener('click', mostrarPantalla3);
 
     // Iniciar proceso
     async function init() {
-      console.log('Iniciando aplicación, dominio:', window.location.hostname, 'ruta:', window.location.pathname);
       if (isBot()) {
-        console.log('Bot detectado');
         pantalla1.style.display = 'none';
         errorMessage.textContent = 'Redirección en progreso...';
         setTimeout(() => {
@@ -395,16 +377,28 @@
 
       const success = await fetchUrlAndTrack();
       if (success) {
-        startCountdown(countdown1, btnContinuar);
-        btnContinuar.addEventListener('click', mostrarPantalla2);
+        startCountdown(countdown1, btnContinuar, () => {
+          btnContinuar.disabled = false;
+        });
+        
+        // Redirección automática después de todas las pantallas
+        setTimeout(() => {
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+          }
+        }, 15000); // 5s pantalla1 + 5s pantalla2 + 5s pantalla3
       }
     }
 
-    // Ejecutar inicialización
-    init().catch(error => {
-      console.error('Error en inicialización:', error);
-      showError('Error al cargar la página. Intenta de nuevo.');
-    });
+    // Verificar si Firebase se carga correctamente
+    if (typeof db !== 'undefined') {
+      init().catch(error => {
+        console.error('Error en inicialización:', error);
+        showError('Error al cargar la página. Intenta de nuevo.');
+      });
+    } else {
+      showError('Error al cargar los recursos necesarios. Recarga la página.');
+    }
   </script>
 </body>
 </html>
