@@ -192,6 +192,9 @@
     .stat-change.down {
       color: var(--error);
     }
+    .stat-change.down i {
+      transform: rotate(180deg);
+    }
     .url-form {
       background: white;
       border-radius: 12px;
@@ -423,9 +426,9 @@
             Enlaces totales
           </div>
           <div class="stat-value" id="totalLinks">0</div>
-          <div class="stat-change up">
+          <div class="stat-change" id="monthlyChange">
             <i class="fas fa-arrow-up"></i>
-            <span>10% este mes</span>
+            <span id="monthlyPercent">0%</span> este mes
           </div>
         </div>
         <div class="stat-card">
@@ -434,9 +437,9 @@
             Visitas totales
           </div>
           <div class="stat-value" id="totalVisits">0</div>
-          <div class="stat-change up">
+          <div class="stat-change" id="weeklyChange">
             <i class="fas fa-arrow-up"></i>
-            <span>5% esta semana</span>
+            <span id="weeklyPercent">0%</span> esta semana
           </div>
         </div>
       </div>
@@ -566,14 +569,52 @@
 
     async function loadStats(userId) {
       try {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+        
         const q = query(collection(db, 'urls'), where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
+        
         let totalClicks = 0;
+        let monthlyLinks = 0;
+        let weeklyClicks = 0;
+        let totalLinks = 0;
+
         querySnapshot.forEach(doc => {
-          totalClicks += doc.data().clicks || 0;
+          const data = doc.data();
+          totalClicks += data.clicks || 0;
+          totalLinks++;
+          
+          // Calcular enlaces creados este mes
+          if (data.createdAt) {
+            const createdAt = data.createdAt.toDate();
+            if (createdAt >= startOfMonth) monthlyLinks++;
+          }
+          
+          // Calcular clicks esta semana
+          if (data.lastClicked) {
+            const lastClicked = data.lastClicked.toDate();
+            if (lastClicked >= startOfWeek) {
+              weeklyClicks += data.clicksThisWeek || 0;
+            }
+          }
         });
-        document.getElementById('totalLinks').textContent = querySnapshot.size;
+
+        // Calcular porcentajes
+        const monthlyPercent = totalLinks > 0 ? Math.round((monthlyLinks / totalLinks) * 100) : 0;
+        const weeklyPercent = totalClicks > 0 ? Math.round((weeklyClicks / totalClicks) * 100) : 0;
+
+        // Actualizar UI
+        document.getElementById('totalLinks').textContent = totalLinks;
         document.getElementById('totalVisits').textContent = totalClicks;
+        document.getElementById('monthlyPercent').textContent = `${monthlyPercent}%`;
+        document.getElementById('weeklyPercent').textContent = `${weeklyPercent}%`;
+
+        // Cambiar estilos según el porcentaje
+        document.getElementById('monthlyChange').className = monthlyPercent >= 0 ? 'stat-change up' : 'stat-change down';
+        document.getElementById('weeklyChange').className = weeklyPercent >= 0 ? 'stat-change up' : 'stat-change down';
+
       } catch (error) {
         console.error("Error al cargar estadísticas:", error);
         errorMessage.textContent = `Error al cargar estadísticas: ${error.message}`;
@@ -627,7 +668,9 @@
         await setDoc(ref, {
           longUrl,
           clicks: 0,
+          clicksThisWeek: 0,
           createdAt: serverTimestamp(),
+          lastClicked: null,
           userId: auth.currentUser.uid
         });
 
@@ -675,4 +718,4 @@
     }
   </script>
 </body>
-  </html>
+</html>
