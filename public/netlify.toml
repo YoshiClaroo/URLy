@@ -20,7 +20,10 @@ to = "/ads.txt"
 status = 200
 force = true
 
-Redirect 301 /ads.txt https://srv.adstxtmanager.com/73084/urly.lat
+[[Redirect]] 
+from = "/https://srv.adstxtmanager.com/73084/urly.lat"
+to "//ads.txt" 
+301
 
 [functions]
 directory = "functions"
