@@ -182,26 +182,6 @@
       gap: 15px;
       flex-wrap: wrap;
     }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin: 25px 0;
-      text-align: left;
-    }
-    .feature-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-    }
-    .feature-icon {
-      color: var(--primary);
-      font-size: 18px;
-      margin-top: 3px;
-    }
-    .feature-text {
-      font-size: 0.95rem;
-    }
     .progress-container {
       width: 100%;
       height: 8px;
@@ -265,16 +245,43 @@
       animation: spin 1s ease-in-out infinite;
       margin: 20px 0;
     }
-    .bot-detected {
-      background-color: rgba(239, 68, 68, 0.1);
+    .captcha-container {
+      background-color: #f3f4f6;
       padding: 20px;
       border-radius: 8px;
       margin: 20px 0;
-      border-left: 4px solid var(--error);
     }
-    .bot-detected h2 {
-      color: var(--error);
-      margin-bottom: 10px;
+    .captcha-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .captcha-item {
+      background-color: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .captcha-item:hover {
+      border-color: var(--primary);
+    }
+    .captcha-item.selected {
+      border-color: var(--success);
+      background-color: rgba(16, 185, 129, 0.1);
+    }
+    .captcha-image {
+      width: 100%;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .captcha-instructions {
+      font-size: 0.9rem;
+      color: var(--gray);
+      margin-bottom: 15px;
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -340,15 +347,15 @@
       .redirect-container {
         padding: 20px 15px;
       }
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
       .skip-options {
         flex-direction: column;
         gap: 10px;
       }
       .btn {
         width: 100%;
+      }
+      .captcha-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
   </style>
@@ -379,7 +386,7 @@
       
       <div class="security-badge">
         <i class="fas fa-shield-alt"></i>
-        <span>Verificación de seguridad en progreso</span>
+        <span>Preparando su enlace</span>
       </div>
       
       <h1>¡Espere un momento!</h1>
@@ -388,7 +395,7 @@
         <div class="progress-bar" id="progressBar1"></div>
       </div>
       
-      <p>Estamos preparando su enlace de forma segura. Por favor espere <span id="countdown1">7</span> segundos...</p>
+      <p>Estamos procesando su solicitud. Por favor espere <span id="countdown1">10</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
@@ -400,40 +407,21 @@
           <i class="fas fa-exclamation-triangle"></i>
           <span>Importante</span>
         </div>
-        <p>Por su seguridad, estamos verificando el enlace destino. No cierre esta página hasta completar el proceso.</p>
+        <p>Por favor no cierre esta página hasta completar el proceso de redirección.</p>
       </div>
       
       <button id="btnContinuar" class="btn" disabled>
         <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
-        <span>Verificando...</span>
+        <span>Procesando...</span>
       </button>
       
       <!-- Banner 300x250 -->
       <div class="ad-container ad-container-300x250">
         <!-- Espacio reservado para publicidad -->
       </div>
-      
-      <div class="features-grid">
-        <div class="feature-item">
-          <i class="fas fa-check-circle feature-icon"></i>
-          <span class="feature-text">Verificación de enlace segura</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-bolt feature-icon"></i>
-          <span class="feature-text">Redirección ultrarrápida</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-shield-virus feature-icon"></i>
-          <span class="feature-text">Protección contra malware</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-lock feature-icon"></i>
-          <span class="feature-text">Cifrado de extremo a extremo</span>
-        </div>
-      </div>
     </div>
 
-    <!-- Pantalla 2: Espera -->
+    <!-- Pantalla 2: Espera con CAPTCHA -->
     <div id="pantalla2" style="display: none;" class="fade-in">
       <div class="step-indicator">
         <div class="step completed">1</div>
@@ -446,37 +434,36 @@
         <span class="logo-text">URLy</span>
       </div>
       
-      <h1>Redireccionando...</h1>
+      <h1>Verificación requerida</h1>
       
       <div class="progress-container">
         <div class="progress-bar" id="progressBar2"></div>
       </div>
       
-      <div class="loader"></div>
-      
-      <p>Estamos procesando su solicitud. Quedan <span id="countdown2">10</span> segundos...</p>
+      <p>Complete esta simple verificación para continuar. Quedan <span id="countdown2">15</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
         <!-- Espacio reservado para publicidad -->
       </div>
       
-      <div class="url-preview">
-        <i class="fas fa-link" style="margin-right: 8px;"></i>
-        <span id="urlPreview">Cargando URL de destino...</span>
-      </div>
-      
-      <div class="warning-box">
-        <div class="warning-title">
-          <i class="fas fa-info-circle"></i>
-          <span>¿Sabías que?</span>
+      <div class="captcha-container">
+        <div class="captcha-instructions">
+          <p>Seleccione todas las imágenes que contengan <strong>semáforos</strong> para verificar que no es un robot.</p>
         </div>
-        <p>URLy protege más de 1 millón de redirecciones diarias contra amenazas de phishing y malware.</p>
+        
+        <div class="captcha-grid" id="captchaGrid">
+          <!-- Las imágenes se generarán con JavaScript -->
+        </div>
+        
+        <button id="verificarCaptcha" class="btn" style="margin-top: 15px;">
+          <i class="fas fa-check-circle"></i> Verificar
+        </button>
       </div>
       
-      <button id="btnIrAPagina3" class="btn" disabled>
-        <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
-        <span>Procesando...</span>
+      <button id="btnIrAPagina3" class="btn" disabled style="display: none;">
+        <i class="fas fa-arrow-right" style="margin-right: 8px;"></i>
+        <span>Continuar</span>
       </button>
       
       <!-- Banner 300x250 -->
@@ -506,10 +493,10 @@
       
       <div class="security-badge">
         <i class="fas fa-check-circle"></i>
-        <span>Verificación de seguridad completada</span>
+        <span>Verificación completada</span>
       </div>
       
-      <p>Serás redirigido en <span id="countdown3">15</span> segundos...</p>
+      <p>Serás redirigido en <span id="countdown3">20</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
@@ -525,25 +512,6 @@
         </button>
       </div>
       
-      <div class="features-grid">
-        <div class="feature-item">
-          <i class="fas fa-rocket feature-icon"></i>
-          <span class="feature-text">Redirección premium disponible</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-user-shield feature-icon"></i>
-          <span class="feature-text">Protección contra bots activa</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-chart-line feature-icon"></i>
-          <span class="feature-text">Estadísticas en tiempo real</span>
-        </div>
-        <div class="feature-item">
-          <i class="fas fa-globe feature-icon"></i>
-          <span class="feature-text">Servidores globales</span>
-        </div>
-      </div>
-      
       <!-- Banner 300x250 -->
       <div class="ad-container ad-container-300x250">
         <!-- Espacio reservado para publicidad -->
@@ -556,19 +524,6 @@
         </div>
         <p>No comparta este enlace con otros. Podría contener información personalizada para usted.</p>
       </div>
-    </div>
-
-    <!-- Pantalla para bots detectados -->
-    <div id="pantallaBot" style="display: none;" class="bot-detected">
-      <div class="logo">
-        <i class="fas fa-robot logo-icon"></i>
-        <span class="logo-text">URLy</span>
-      </div>
-      <h2>Actividad sospechosa detectada</h2>
-      <p>Hemos identificado que podrías ser un bot o crawler automatizado. Por razones de seguridad, el proceso de redirección se ha detenido.</p>
-      <p>Si eres un usuario real, por favor desactiva cualquier extensión de automatización y recarga la página.</p>
-      <div class="loader" style="border-top-color: var(--error); margin: 30px auto;"></div>
-      <p>Redirigiendo a la página principal en <span id="countdownBot">5</span> segundos...</p>
     </div>
 
     <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -593,16 +548,15 @@
     const countdown1 = document.getElementById('countdown1');
     const countdown2 = document.getElementById('countdown2');
     const countdown3 = document.getElementById('countdown3');
-    const countdownBot = document.getElementById('countdownBot');
     const btnContinuar = document.getElementById('btnContinuar');
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
     const btnIrAPagina3 = document.getElementById('btnIrAPagina3');
+    const verificarCaptcha = document.getElementById('verificarCaptcha');
     const pantalla1 = document.getElementById('pantalla1');
     const pantalla2 = document.getElementById('pantalla2');
     const pantalla3 = document.getElementById('pantalla3');
-    const pantallaBot = document.getElementById('pantallaBot');
-    const urlPreview = document.getElementById('urlPreview');
+    const captchaGrid = document.getElementById('captchaGrid');
     const progressBar1 = document.getElementById('progressBar1');
     const progressBar2 = document.getElementById('progressBar2');
     const progressBar3 = document.getElementById('progressBar3');
@@ -611,82 +565,74 @@
     let redirectUrl = '';
     const pathSegments = window.location.pathname.split('/');
     const alias = pathSegments[pathSegments.length - 1] || null;
-    let isHuman = true;
+    let captchaSolved = false;
 
-    // Mejorada función para detectar bots
-    function isBot() {
-      const userAgent = navigator.userAgent;
-      const botPatterns = [
-        /bot/, /googlebot/, /crawler/, /spider/, /robot/, /crawling/,
-        /facebookexternalhit/, /twitterbot/, /rogerbot/, /linkedinbot/,
-        /embedly/, /quora link preview/, /showyoubot/, /outbrain/,
-        /pinterest/, /slackbot/, /vkShare/, /W3C_Validator/, /redditbot/
-      ];
+    // Imágenes para el CAPTCHA (puedes agregar más)
+    const captchaImages = [
+      { src: 'https://via.placeholder.com/150?text=Semáforo', correct: true },
+      { src: 'https://via.placeholder.com/150?text=Auto', correct: false },
+      { src: 'https://via.placeholder.com/150?text=Semáforo', correct: true },
+      { src: 'https://via.placeholder.com/150?text=Edificio', correct: false },
+      { src: 'https://via.placeholder.com/150?text=Árbol', correct: false },
+      { src: 'https://via.placeholder.com/150?text=Semáforo', correct: true },
+      { src: 'https://via.placeholder.com/150?text=Señal', correct: false },
+      { src: 'https://via.placeholder.com/150?text=Peatón', correct: false },
+      { src: 'https://via.placeholder.com/150?text=Semáforo', correct: true }
+    ];
+
+    // Generar CAPTCHA
+    function generateCaptcha() {
+      captchaGrid.innerHTML = '';
+      // Mezclar imágenes
+      const shuffledImages = [...captchaImages].sort(() => Math.random() - 0.5);
       
-      // Detectar headless browsers
-      const isHeadless = !navigator.webdriver === false || 
-                        window.callPhantom || 
-                        window._phantom || 
-                        window.phantom;
-      
-      // Detectar automation tools
-      const isAutomation = navigator.webdriver || 
-                          window.domAutomation || 
-                          window.domAutomationController;
-      
-      // Verificar si el navegador soporta ciertas APIs que los bots suelen no soportar
-      const isMissingAPIs = !window.Notification || 
-                           !window.chrome || 
-                           !window.chrome.app || 
-                           !window.Intl;
-      
-      // Comprobar plugins (los bots suelen no tener plugins)
-      const hasNoPlugins = navigator.plugins.length === 0;
-      
-      // Comprobar si el navegado
-      let canExecuteJS = true;
-      try {
-        // Intenta ejecutar código que los bots suelen no poder ejecutar
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!ctx) canExecuteJS = false;
-      } catch(e) {
-        canExecuteJS = false;
-      }
-      
-      // Combinar todas las pruebas
-      const isLikelyBot = botPatterns.some(pattern => pattern.test(userAgent)) || 
-                         isHeadless || 
-                         isAutomation || 
-                         (isMissingAPIs && hasNoPlugins) || 
-                         !canExecuteJS;
-      
-      return isLikelyBot;
+      shuffledImages.forEach((image, index) => {
+        const item = document.createElement('div');
+        item.className = 'captcha-item';
+        item.dataset.index = index;
+        item.dataset.correct = image.correct;
+        
+        const img = document.createElement('img');
+        img.src = image.src;
+        img.alt = 'Imagen CAPTCHA';
+        img.className = 'captcha-image';
+        
+        item.appendChild(img);
+        item.addEventListener('click', () => {
+          item.classList.toggle('selected');
+        });
+        
+        captchaGrid.appendChild(item);
+      });
     }
 
-    // Función para simular comportamiento humano (movimiento del ratón, teclado, etc.)
-    function simulateHumanBehavior() {
-      // Solo se ejecuta si no es un bot
-      if (!isBot()) {
-        // Simular movimiento del ratón aleatorio
-        document.addEventListener('mousemove', (e) => {
-          isHuman = true;
-        });
-        
-        // Simular actividad de teclado
-        document.addEventListener('keydown', (e) => {
-          isHuman = true;
-        });
-        
-        // Simular scroll
-        document.addEventListener('scroll', (e) => {
-          isHuman = true;
-        });
-        
-        // Simular clicks
-        document.addEventListener('click', (e) => {
-          isHuman = true;
-        });
+    // Verificar CAPTCHA
+    function verifyCaptcha() {
+      const selectedItems = document.querySelectorAll('.captcha-item.selected');
+      let allCorrect = true;
+      
+      selectedItems.forEach(item => {
+        if (item.dataset.correct !== 'true') {
+          allCorrect = false;
+        }
+      });
+      
+      // También verificar que se seleccionaron TODAS las correctas
+      const correctItems = document.querySelectorAll('.captcha-item[data-correct="true"]');
+      correctItems.forEach(item => {
+        if (!item.classList.contains('selected')) {
+          allCorrect = false;
+        }
+      });
+      
+      if (allCorrect && selectedItems.length > 0) {
+        captchaSolved = true;
+        btnIrAPagina3.style.display = 'inline-block';
+        verificarCaptcha.innerHTML = '<i class="fas fa-check-circle"></i> Verificación exitosa';
+        verificarCaptcha.style.backgroundColor = '#10b981';
+      } else {
+        alert('Selección incorrecta. Por favor intente nuevamente.');
+        generateCaptcha();
       }
     }
 
@@ -694,7 +640,7 @@
     function startCountdown(element, progressBar, button, seconds, callback) {
       let remaining = seconds;
       element.textContent = remaining;
-      button.disabled = true;
+      if (button) button.disabled = true;
       
       // Resetear barra de progreso
       if (progressBar) {
@@ -723,16 +669,12 @@
     function mostrarPantalla2() {
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
+      generateCaptcha();
       
-      // Actualizar vista previa de URL
-      if (redirectUrl) {
-        urlPreview.textContent = redirectUrl.length > 50 
-          ? redirectUrl.substring(0, 50) + '...' 
-          : redirectUrl;
-      }
-      
-      startCountdown(countdown2, progressBar2, btnIrAPagina3, 10, () => {
-        btnIrAPagina3.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
+      startCountdown(countdown2, progressBar2, null, 15, () => {
+        if (captchaSolved) {
+          btnIrAPagina3.disabled = false;
+        }
       });
     }
 
@@ -740,11 +682,9 @@
     function mostrarPantalla3() {
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
-      startCountdown(countdown3, progressBar3, null, 15, () => {
+      startCountdown(countdown3, progressBar3, null, 20, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
-        skipBtn.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
-        skipAdBtn.innerHTML = '<i class="fas fa-bolt" style="margin-right: 8px;"></i> ¡Saltar AHORA!';
       });
     }
 
@@ -756,18 +696,6 @@
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'none';
-    }
-
-    // Mostrar pantalla de bot
-    function showBotScreen() {
-      pantalla1.style.display = 'none';
-      pantalla2.style.display = 'none';
-      pantalla3.style.display = 'none';
-      pantallaBot.style.display = 'block';
-      
-      startCountdown(countdownBot, null, null, 5, () => {
-        window.location.href = '/index.html';
-      });
     }
 
     // Función para obtener la URL y registrar clics
@@ -820,37 +748,19 @@
     });
 
     // Evento para el botón Continuar en pantalla 1
-    btnContinuar.addEventListener('click', () => {
-      // Verificar comportamiento humano antes de continuar
-      if (!isHuman) {
-        showBotScreen();
-        return;
-      }
-      mostrarPantalla2();
-    });
+    btnContinuar.addEventListener('click', mostrarPantalla2);
 
     // Evento para el botón Continuar en pantalla 2
-    btnIrAPagina3.addEventListener('click', () => {
-      // Verificar comportamiento humano antes de continuar
-      if (!isHuman) {
-        showBotScreen();
-        return;
-      }
-      mostrarPantalla3();
-    });
+    btnIrAPagina3.addEventListener('click', mostrarPantalla3);
+
+    // Evento para verificar CAPTCHA
+    verificarCaptcha.addEventListener('click', verifyCaptcha);
 
     // Iniciar proceso
     async function init() {
-      simulateHumanBehavior();
-      
-      if (isBot()) {
-        showBotScreen();
-        return;
-      }
-
       const success = await fetchUrlAndTrack();
       if (success) {
-        startCountdown(countdown1, progressBar1, btnContinuar, 7, () => {
+        startCountdown(countdown1, progressBar1, btnContinuar, 10, () => {
           btnContinuar.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
         });
       }
@@ -867,4 +777,3 @@
   </script>
 </body>
 </html>
-    
