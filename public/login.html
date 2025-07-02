@@ -267,7 +267,62 @@
   </footer>
 
   <script type="module">
-    // (El código JavaScript permanece igual)
+    import { auth } from './js/firebase.js';
+    import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.0/firebase-auth.js';
+
+    let isRedirecting = false;
+
+    onAuthStateChanged(auth, (user) => {
+      if (isRedirecting) return;
+      if (user) {
+        isRedirecting = true;
+        window.location.href = '/index.html';
+      }
+    });
+
+    const googleSignInBtn = document.getElementById('googleSignInBtn');
+    const errorMessage = document.getElementById('errorMessage');
+
+    googleSignInBtn.addEventListener('click', async () => {
+      googleSignInBtn.disabled = true;
+      googleSignInBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando...';
+      errorMessage.style.display = 'none';
+
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        isRedirecting = true;
+        window.location.href = '/index.html';
+      } catch (error) {
+        console.error('Error al iniciar sesión con Google:', error);
+        errorMessage.textContent = translateAuthError(error.code);
+        errorMessage.style.display = 'block';
+      } finally {
+        googleSignInBtn.disabled = false;
+        googleSignInBtn.innerHTML = '<i class="fab fa-google"></i> Continuar con Google';
+      }
+    });
+
+    function translateAuthError(code) {
+      const errors = {
+        'auth/popup-closed-by-user': 'Cancelaste el inicio de sesión',
+        'auth/network-request-failed': 'Error de conexión. Verifica tu internet',
+        'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde',
+        'auth/account-exists-with-different-credential': 'Este email ya está registrado',
+        'auth/popup-blocked': 'El popup fue bloqueado. Permítelo para continuar',
+        'auth/operation-not-allowed': 'Método de login no permitido',
+        'default': 'Error al iniciar sesión. Intenta nuevamente'
+      };
+      return errors[code] || errors['default'];
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registrado'))
+          .catch(err => console.error('Error al registrar Service Worker:', err));
+      });
+    }
   </script>
 </body>
-</html>
+  </html>
