@@ -6,16 +6,19 @@
   <meta name="google-adsense-account" content="ca-pub-3539363562189833">
   <title>Mis URLs | URLy</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #1e40af;
-      --primary-dark: #1e3a8a;
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
       --secondary: #e0e7ff;
       --dark: #1e293b;
       --light: #f8fafc;
       --gray: #64748b;
       --success: #10b981;
       --error: #ef4444;
+      --premium: #FF512F;
+      --premium-gradient: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
     }
     * {
       box-sizing: border-box;
@@ -23,10 +26,11 @@
       padding: 0;
     }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--light);
       color: var(--dark);
       line-height: 1.6;
+      background-image: radial-gradient(circle at 10% 20%, rgba(224, 231, 255, 0.5) 0%, rgba(248, 250, 252, 0.5) 90%);
     }
     .container {
       max-width: 1200px;
@@ -61,6 +65,9 @@
       font-size: 24px;
       font-weight: 700;
       color: var(--dark);
+      background: linear-gradient(to right, var(--primary), var(--premium));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .user-menu {
       display: flex;
@@ -85,10 +92,13 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      transition: background 0.3s;
+      transition: all 0.3s;
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
     }
     .auth-button:hover {
       background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
     }
     .auth-button i {
       font-size: 18px;
@@ -104,59 +114,174 @@
       align-items: center;
       gap: 10px;
     }
-    .url-list {
+    .url-list-container {
       background: white;
       border-radius: 12px;
       padding: 20px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
     }
-    .url-item {
+    .url-list-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--premium-gradient);
+    }
+    .url-list-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 20px;
+    }
+    .search-container {
+      position: relative;
+      width: 300px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 10px 15px 10px 40px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+    }
+    .url-list {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .url-list th {
+      text-align: left;
+      padding: 12px 15px;
+      background-color: var(--secondary);
+      color: var(--dark);
+      font-weight: 600;
+    }
+    .url-list td {
       padding: 15px;
       border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
     }
-    .url-info {
-      flex: 1;
+    .url-list tr:last-child td {
+      border-bottom: none;
     }
-    .url-info div {
-      margin-bottom: 5px;
+    .url-list tr:hover {
+      background-color: rgba(224, 231, 255, 0.3);
+    }
+    .url-original {
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .url-short {
+      font-weight: 500;
+    }
+    .url-clicks {
+      text-align: center;
+      font-weight: 600;
     }
     .url-actions {
       display: flex;
       gap: 10px;
+      justify-content: flex-end;
     }
     .btn {
       background: var(--primary);
       color: white;
       border: none;
-      padding: 14px 25px;
-      border-radius: 8px;
+      padding: 8px 15px;
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 500;
-      transition: background 0.3s;
+      transition: all 0.3s;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 5px;
+      box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
     }
     .btn:hover {
       background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+    }
+    .btn i {
+      font-size: 14px;
     }
     .btn-copy {
       background: var(--success);
-      padding: 10px 15px;
     }
     .btn-copy:hover {
       background: #0d9f6e;
     }
+    .btn-delete {
+      background: var(--error);
+    }
+    .btn-delete:hover {
+      background: #dc2626;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .page-btn {
+      padding: 8px 15px;
+      border: 1px solid #e2e8f0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .page-btn:hover {
+      background: var(--secondary);
+    }
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray);
+    }
+    .empty-state i {
+      font-size: 50px;
+      margin-bottom: 15px;
+      color: var(--secondary);
+    }
     .error-message {
       color: var(--error);
       margin-top: 20px;
-      display: none;
+      padding: 15px;
+      background-color: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid var(--error);
       text-align: center;
+      display: none;
     }
     footer {
       background: var(--dark);
@@ -182,6 +307,40 @@
       margin-top: 20px;
       color: #94a3b8;
     }
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .url-list-header {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .search-container {
+        width: 100%;
+      }
+      .url-list td {
+        display: block;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+      }
+      .url-list td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: calc(50% - 15px);
+        padding-right: 10px;
+        font-weight: 600;
+        text-align: left;
+      }
+      .url-list th {
+        display: none;
+      }
+      .url-actions {
+        justify-content: center;
+      }
+    }
   </style>
 </head>
 <body>
@@ -206,14 +365,33 @@
         <i class="fas fa-list"></i>
         Mis URLs Acortadas
       </h2>
-      <div class="url-list" id="urlList"></div>
+      
+      <div class="url-list-container">
+        <div class="url-list-header">
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar URLs...">
+          </div>
+        </div>
+        
+        <div id="urlListContent">
+          <!-- Contenido dinámico se insertará aquí -->
+        </div>
+        
+        <div id="pagination" class="pagination">
+          <!-- Paginación dinámica se insertará aquí -->
+        </div>
+      </div>
+      
       <a href="/index.html" class="btn">
         <i class="fas fa-arrow-left"></i>
         Volver
       </a>
+      
       <div id="errorMessage" class="error-message"></div>
     </div>
   </main>
+  
   <footer>
     <div class="container">
       <div class="footer-links">
@@ -225,17 +403,32 @@
       </div>
     </div>
   </footer>
+
   <script type="module">
     import { auth, db } from './js/firebase.js';
     import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.0/firebase-auth.js';
-    import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.7.0/firebase-firestore.js';
+    import { collection, query, where, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/11.7.0/firebase-firestore.js';
 
     let isRedirecting = false;
+    let currentUser = null;
+    let allUrls = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
 
+    // Elementos del DOM
+    const userAvatar = document.getElementById('userAvatar');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const urlListContent = document.getElementById('urlListContent');
+    const paginationElement = document.getElementById('pagination');
+    const searchInput = document.getElementById('searchInput');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Inicializar la aplicación
     onAuthStateChanged(auth, (user) => {
       if (isRedirecting) return;
       if (user) {
-        if (user.photoURL) document.getElementById('userAvatar').src = user.photoURL;
+        currentUser = user;
+        if (user.photoURL) userAvatar.src = user.photoURL;
         loadUrls(user.uid);
       } else {
         isRedirecting = true;
@@ -243,7 +436,8 @@
       }
     });
 
-    document.getElementById('signOutBtn').addEventListener('click', async () => {
+    // Evento para cerrar sesión
+    signOutBtn.addEventListener('click', async () => {
       if (isRedirecting) return;
       isRedirecting = true;
       try {
@@ -251,55 +445,239 @@
         window.location.href = '/login.html';
       } catch (error) {
         console.error('Error al cerrar sesión:', error);
-        document.getElementById('errorMessage').textContent = `Error al cerrar sesión: ${error.message}`;
-        document.getElementById('errorMessage').style.display = 'block';
+        showError(`Error al cerrar sesión: ${error.message}`);
         isRedirecting = false;
       }
     });
 
+    // Evento para búsqueda
+    searchInput.addEventListener('input', () => {
+      currentPage = 1;
+      filterAndDisplayUrls();
+    });
+
+    // Cargar URLs desde Firebase
     async function loadUrls(userId) {
       try {
         const q = query(collection(db, 'urls'), where('userId', '==', userId));
         const querySnapshot = await getDocs(q);
-        const urlList = document.getElementById('urlList');
-        urlList.innerHTML = '';
-        if (querySnapshot.empty) {
-          urlList.innerHTML = '<p>No tienes URLs acortadas.</p>';
-          return;
-        }
+        
+        allUrls = [];
         querySnapshot.forEach(doc => {
-          const { longUrl, clicks } = doc.data();
-          const shortId = doc.id;
-          const shortUrl = `https://urly.lat/r/${shortId}`;
-          const item = document.createElement('div');
-          item.className = 'url-item';
-          item.innerHTML = `
-            <div class="url-info">
-              <div><strong>Original:</strong> <a href="${longUrl}" target="_blank">${longUrl}</a></div>
-              <div><strong>Acortada:</strong> <a href="${shortUrl}" target="_blank">${shortUrl}</a></div>
-              <div><strong>Clics:</strong> ${clicks}</div>
-            </div>
-            <div class="url-actions">
-              <button class="btn btn-copy" onclick="navigator.clipboard.writeText('${shortUrl}').then(() => {
-                this.innerHTML = '<i class=\\'fas fa-check\\'></i> Copiado!';
-                setTimeout(() => this.innerHTML = '<i class=\\'fas fa-copy\\'></i> Copiar', 2000);
-              }).catch(() => {
-                document.getElementById('errorMessage').textContent = 'Error al copiar la URL';
-                document.getElementById('errorMessage').style.display = 'block';
-              })">
-                <i class="fas fa-copy"></i> Copiar
-              </button>
-            </div>
-          `;
-          urlList.appendChild(item);
+          const data = doc.data();
+          allUrls.push({
+            id: doc.id,
+            shortUrl: `https://urly.lat/r/${doc.id}`,
+            originalUrl: data.longUrl,
+            clicks: data.clicks || 0,
+            createdAt: data.createdAt?.toDate() || new Date()
+          });
         });
+
+        // Ordenar por fecha de creación (más reciente primero)
+        allUrls.sort((a, b) => b.createdAt - a.createdAt);
+        
+        filterAndDisplayUrls();
       } catch (error) {
         console.error('Error al cargar URLs:', error);
-        document.getElementById('errorMessage').textContent = `Error al cargar URLs: ${error.message}`;
-        document.getElementById('errorMessage').style.display = 'block';
+        showError(`Error al cargar URLs: ${error.message}`);
       }
     }
 
+    // Filtrar y mostrar URLs con paginación
+    function filterAndDisplayUrls() {
+      const searchTerm = searchInput.value.toLowerCase();
+      let filteredUrls = allUrls;
+      
+      // Aplicar filtro de búsqueda si existe
+      if (searchTerm) {
+        filteredUrls = allUrls.filter(url => 
+          url.originalUrl.toLowerCase().includes(searchTerm) || 
+          url.shortUrl.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Calcular paginación
+      const totalPages = Math.ceil(filteredUrls.length / itemsPerPage);
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedUrls = filteredUrls.slice(startIndex, startIndex + itemsPerPage);
+      
+      // Mostrar URLs
+      displayUrls(paginatedUrls);
+      
+      // Mostrar paginación
+      displayPagination(filteredUrls.length, totalPages);
+    }
+
+    // Mostrar URLs en la tabla
+    function displayUrls(urls) {
+      if (urls.length === 0) {
+        urlListContent.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-link"></i>
+            <h3>No se encontraron URLs</h3>
+            <p>${searchInput.value ? 'No hay coincidencias con tu búsqueda' : 'No tienes URLs acortadas aún'}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = `
+        <div class="table-responsive">
+          <table class="url-list">
+            <thead>
+              <tr>
+                <th>URL Original</th>
+                <th>URL Acortada</th>
+                <th style="text-align: center;">Clics</th>
+                <th style="text-align: right;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      urls.forEach(url => {
+        html += `
+          <tr>
+            <td data-label="Original" class="url-original">
+              <a href="${url.originalUrl}" target="_blank" title="${url.originalUrl}">
+                ${url.originalUrl.length > 40 ? url.originalUrl.substring(0, 40) + '...' : url.originalUrl}
+              </a>
+            </td>
+            <td data-label="Acortada" class="url-short">
+              <a href="${url.shortUrl}" target="_blank">${url.shortUrl}</a>
+            </td>
+            <td data-label="Clics" class="url-clicks">${url.clicks}</td>
+            <td data-label="Acciones" class="url-actions">
+              <button class="btn btn-copy" onclick="copyToClipboard('${url.shortUrl}', this)">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+              <button class="btn btn-delete" onclick="deleteUrl('${url.id}', this)">
+                <i class="fas fa-trash"></i> Eliminar
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      urlListContent.innerHTML = html;
+    }
+
+    // Mostrar controles de paginación
+    function displayPagination(totalItems, totalPages) {
+      if (totalPages <= 1) {
+        paginationElement.innerHTML = '';
+        return;
+      }
+      
+      let html = '';
+      
+      // Botón Anterior
+      html += `
+        <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      `;
+      
+      // Páginas
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+      
+      if (endPage - startPage + 1 < maxVisiblePages) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+      
+      if (startPage > 1) {
+        html += `<button class="page-btn" onclick="changePage(1)">1</button>`;
+        if (startPage > 2) {
+          html += `<span class="page-btn disabled">...</span>`;
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        html += `
+          <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+            ${i}
+          </button>
+        `;
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          html += `<span class="page-btn disabled">...</span>`;
+        }
+        html += `<button class="page-btn" onclick="changePage(${totalPages})">${totalPages}</button>`;
+      }
+      
+      // Botón Siguiente
+      html += `
+        <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
+      
+      paginationElement.innerHTML = html;
+    }
+
+    // Cambiar de página
+    window.changePage = function(page) {
+      if (page < 1 || page > Math.ceil(allUrls.length / itemsPerPage)) return;
+      currentPage = page;
+      filterAndDisplayUrls();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Copiar URL al portapapeles
+    window.copyToClipboard = async function(text, button) {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+        setTimeout(() => {
+          button.innerHTML = '<i class="fas fa-copy"></i> Copiar';
+        }, 2000);
+      } catch (err) {
+        showError('Error al copiar la URL');
+      }
+    };
+
+    // Eliminar URL
+    window.deleteUrl = async function(urlId, button) {
+      if (!confirm('¿Estás seguro de que quieres eliminar esta URL?')) return;
+      
+      button.disabled = true;
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Eliminando...';
+      
+      try {
+        await deleteDoc(doc(db, 'urls', urlId));
+        allUrls = allUrls.filter(url => url.id !== urlId);
+        filterAndDisplayUrls();
+      } catch (error) {
+        console.error('Error al eliminar URL:', error);
+        showError(`Error al eliminar URL: ${error.message}`);
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-trash"></i> Eliminar';
+      }
+    };
+
+    // Mostrar mensaje de error
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+      }, 5000);
+    }
+
+    // Registrar Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
