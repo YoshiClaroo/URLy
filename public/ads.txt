@@ -1,1 +1,13 @@
+#Ads.txt urly.lat
+#Ads.txt administrado por AdsTxtManager.com: la herramienta gratuita de administración de ads.txt para editores
+dominiopropietario=urly.lat
+contacto=directsales@ezoic.com
+dominio del administrador=ezoic.ai
 
+ezoic.ai, f7243fab011046bb2a69cd7fd49363b1, DIRECT
+# 35
+themediagrid.com, 4M5PGT, DIRECTO, 35d5010d7789b49d
+themediagrid.com, Q19AKF, DIRECTO, 35d5010d7789b49d
+sonobi.com, 192ecdea01, REVENDEDOR, d1a215d9eb5aee9e
+google.com, pub-6644558441501035, DIRECTO, f08c47fec0942fa0
+google.com, pub-1175987143200523, DISTRIBUIDOR, f08c47fec0942fa0
