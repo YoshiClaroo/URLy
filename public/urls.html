@@ -270,7 +270,7 @@
         querySnapshot.forEach(doc => {
           const { longUrl, clicks } = doc.data();
           const shortId = doc.id;
-          const shortUrl = `https://urlyi.netlify.app/r/${shortId}`;
+          const shortUrl = `https://urly.lat/r/${shortId}`;
           const item = document.createElement('div');
           item.className = 'url-item';
           item.innerHTML = `
