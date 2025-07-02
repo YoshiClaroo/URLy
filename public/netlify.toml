@@ -22,8 +22,9 @@ force = true
 
 [[Redirect]] 
 from = "/https://srv.adstxtmanager.com/73084/urly.lat"
-to "//ads.txt" 
-301
+to = "//ads.txt" 
+status = 301
+force =true
 
 [functions]
 directory = "functions"
