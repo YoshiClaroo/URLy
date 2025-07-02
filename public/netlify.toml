@@ -20,5 +20,7 @@ to = "/ads.txt"
 status = 200
 force = true
 
+Redirect 301 /ads.txt https://srv.adstxtmanager.com/73084/urly.lat
+
 [functions]
 directory = "functions"
