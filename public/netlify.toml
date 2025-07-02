@@ -15,12 +15,6 @@ status = 200
 force = true
 
 [[redirects]]
-from = "/*"
-to = "/ads.txt"
-status = 200
-force = true
-
-[[redirects]]
   from = "/ads.txt"
   to = "https://srv.adstxtmanager.com/73084/urly.lat"
   status = 301
