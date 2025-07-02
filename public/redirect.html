@@ -13,10 +13,11 @@
   <link rel="preconnect" href="https://adoto.net">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #1e40af;
-      --primary-dark: #1e3a8a;
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
       --secondary: #e0e7ff;
       --dark: #1e293b;
       --light: #f8fafc;
@@ -25,6 +26,7 @@
       --error: #ef4444;
       --premium: #FF512F;
       --premium-gradient: linear-gradient(135deg, #FF512F 0%, #DD2476 100%);
+      --warning: #f59e0b;
     }
     * {
       box-sizing: border-box;
@@ -32,7 +34,7 @@
       padding: 0;
     }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
       background-color: var(--light);
       color: var(--dark);
       line-height: 1.6;
@@ -40,24 +42,36 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding-bottom: 80px;
+      padding: 20px;
+      background-image: radial-gradient(circle at 10% 20%, rgba(224, 231, 255, 0.5) 0%, rgba(248, 250, 252, 0.5) 90%);
     }
     .redirect-container {
       text-align: center;
-      padding: 20px;
+      padding: 30px;
       background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       max-width: 800px;
-      width: 95%;
-      margin-top: 40px;
+      width: 100%;
+      margin-top: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .redirect-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--premium-gradient);
     }
     .logo {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     .logo-icon {
       color: var(--primary);
@@ -67,24 +81,33 @@
       font-size: 28px;
       font-weight: 700;
       color: var(--dark);
+      background: linear-gradient(to right, var(--primary), var(--premium));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 15px;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      font-weight: 600;
     }
     p {
       color: var(--gray);
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      font-size: 1.05rem;
     }
     .error-message {
       color: var(--error);
-      margin-top: 15px;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      border-left: 4px solid var(--error);
     }
     .btn {
       background: var(--primary);
       color: white;
       border: none;
-      padding: 12px 24px;
+      padding: 14px 28px;
       border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
@@ -92,52 +115,241 @@
       text-decoration: none;
       display: inline-block;
       transition: all 0.3s ease;
-      font-weight: bold;
+      font-weight: 600;
+      box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
     }
     .btn:hover {
       background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
     }
     .btn-premium {
       background: var(--premium-gradient);
       color: white;
       box-shadow: 0 4px 15px rgba(221, 36, 118, 0.4);
       animation: pulse 1.5s infinite;
+      font-weight: 700;
     }
     .btn-premium:hover {
       opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(221, 36, 118, 0.5);
     }
     .btn:disabled {
       background: var(--gray);
       cursor: not-allowed;
       opacity: 0.6;
+      transform: none;
+      box-shadow: none;
     }
     .countdown {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       color: var(--primary);
-      margin: 15px 0;
+      margin: 20px 0;
+      display: inline-block;
+      min-width: 50px;
     }
     .ad-container {
-      margin: 15px auto;
+      margin: 20px auto;
       text-align: center;
       overflow: hidden;
       background: #f5f5f5;
-      border-radius: 8px;
+      border-radius: 12px;
       min-height: 90px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 1px dashed var(--gray);
+      position: relative;
+    }
+    .ad-container::before {
+      content: 'Publicidad';
+      position: absolute;
+      top: 5px;
+      left: 10px;
+      font-size: 10px;
+      color: var(--gray);
+      font-weight: bold;
     }
     .ad-container-300x250 {
       min-height: 250px;
     }
     .skip-options {
+      margin: 25px 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 25px 0;
+      text-align: left;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .feature-icon {
+      color: var(--primary);
+      font-size: 18px;
+      margin-top: 3px;
+    }
+    .feature-text {
+      font-size: 0.95rem;
+    }
+    .progress-container {
+      width: 100%;
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--premium-gradient);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 0.9rem;
       margin: 15px 0;
+      font-weight: 500;
+    }
+    .warning-box {
+      background-color: rgba(245, 158, 11, 0.1);
+      border-left: 4px solid var(--warning);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .warning-title {
+      color: var(--warning);
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .url-preview {
+      background-color: #f3f4f6;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      word-break: break-all;
+      margin: 15px 0;
+      text-align: center;
+      font-size: 0.9rem;
+      border: 1px solid #e5e7eb;
+    }
+    .loader {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(79, 70, 229, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      margin: 20px 0;
+    }
+    .bot-detected {
+      background-color: rgba(239, 68, 68, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid var(--error);
+    }
+    .bot-detected h2 {
+      color: var(--error);
+      margin-bottom: 10px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
       100% { transform: scale(1); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      gap: 10px;
+    }
+    .step {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      background-color: #e5e7eb;
+      color: var(--gray);
+      position: relative;
+    }
+    .step.active {
+      background-color: var(--primary);
+      color: white;
+    }
+    .step.completed {
+      background-color: var(--success);
+      color: white;
+    }
+    .step::after {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 2px;
+      background-color: #e5e7eb;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .step:last-child::after {
+      display: none;
+    }
+    .step.active::after {
+      background: linear-gradient(to right, var(--primary), #e5e7eb);
+    }
+    .step.completed::after {
+      background-color: var(--success);
+    }
+    @media (max-width: 768px) {
+      .redirect-container {
+        padding: 20px 15px;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .skip-options {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -153,81 +365,216 @@
 
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
-    <div id="pantalla1">
+    <div id="pantalla1" class="fade-in">
+      <div class="step-indicator">
+        <div class="step active">1</div>
+        <div class="step">2</div>
+        <div class="step">3</div>
+      </div>
+      
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
-      <h1>Espere, por favor</h1>
+      
+      <div class="security-badge">
+        <i class="fas fa-shield-alt"></i>
+        <span>Verificación de seguridad en progreso</span>
+      </div>
+      
+      <h1>¡Espere un momento!</h1>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar1"></div>
+      </div>
+      
+      <p>Estamos preparando su enlace de forma segura. Por favor espere <span id="countdown1">7</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
-      
+        <!-- Espacio reservado para publicidad -->
       </div>
       
-      <p>Preparando tu enlace en <span id="countdown1">5</span> segundos...</p>
-      <button id="btnContinuar" class="btn" disabled>Continuar</button>
+      <div class="warning-box">
+        <div class="warning-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Importante</span>
+        </div>
+        <p>Por su seguridad, estamos verificando el enlace destino. No cierre esta página hasta completar el proceso.</p>
+      </div>
+      
+      <button id="btnContinuar" class="btn" disabled>
+        <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+        <span>Verificando...</span>
+      </button>
       
       <!-- Banner 300x250 -->
       <div class="ad-container ad-container-300x250">
+        <!-- Espacio reservado para publicidad -->
+      </div>
       
+      <div class="features-grid">
+        <div class="feature-item">
+          <i class="fas fa-check-circle feature-icon"></i>
+          <span class="feature-text">Verificación de enlace segura</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-bolt feature-icon"></i>
+          <span class="feature-text">Redirección ultrarrápida</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-shield-virus feature-icon"></i>
+          <span class="feature-text">Protección contra malware</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-lock feature-icon"></i>
+          <span class="feature-text">Cifrado de extremo a extremo</span>
+        </div>
       </div>
     </div>
 
     <!-- Pantalla 2: Espera -->
-    <div id="pantalla2" style="display: none;">
+    <div id="pantalla2" style="display: none;" class="fade-in">
+      <div class="step-indicator">
+        <div class="step completed">1</div>
+        <div class="step active">2</div>
+        <div class="step">3</div>
+      </div>
+      
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
+      
       <h1>Redireccionando...</h1>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar2"></div>
+      </div>
+      
+      <div class="loader"></div>
+      
+      <p>Estamos procesando su solicitud. Quedan <span id="countdown2">10</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
-      
+        <!-- Espacio reservado para publicidad -->
       </div>
       
-      <p>Por favor espere <span id="countdown2">5</span> segundos...</p>
-      <button id="btnIrAPagina3" class="btn" disabled>Continuar</button>
-      <div class="error-message"></div>
+      <div class="url-preview">
+        <i class="fas fa-link" style="margin-right: 8px;"></i>
+        <span id="urlPreview">Cargando URL de destino...</span>
+      </div>
+      
+      <div class="warning-box">
+        <div class="warning-title">
+          <i class="fas fa-info-circle"></i>
+          <span>¿Sabías que?</span>
+        </div>
+        <p>URLy protege más de 1 millón de redirecciones diarias contra amenazas de phishing y malware.</p>
+      </div>
+      
+      <button id="btnIrAPagina3" class="btn" disabled>
+        <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+        <span>Procesando...</span>
+      </button>
       
       <!-- Banner 300x250 -->
       <div class="ad-container ad-container-300x250">
-      
+        <!-- Espacio reservado para publicidad -->
       </div>
     </div>
 
     <!-- Pantalla 3: Generando URL -->
-    <div id="pantalla3" style="display: none;">
+    <div id="pantalla3" style="display: none;" class="fade-in">
+      <div class="step-indicator">
+        <div class="step completed">1</div>
+        <div class="step completed">2</div>
+        <div class="step active">3</div>
+      </div>
+      
       <div class="logo">
         <i class="fas fa-link logo-icon"></i>
         <span class="logo-text">URLy</span>
       </div>
-      <h1>¡Enlace listo!</h1>
+      
+      <h1>¡Redirección lista!</h1>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar3"></div>
+      </div>
+      
+      <div class="security-badge">
+        <i class="fas fa-check-circle"></i>
+        <span>Verificación de seguridad completada</span>
+      </div>
+      
+      <p>Serás redirigido en <span id="countdown3">15</span> segundos...</p>
       
       <!-- Banner 728x90 -->
       <div class="ad-container">
-      
+        <!-- Espacio reservado para publicidad -->
       </div>
       
-      <p>Continúa en <span id="countdown3">5</span> segundos...</p>
       <div class="skip-options">
         <button id="skipAdBtn" class="btn btn-premium" disabled>
-          🔥 ¡Saltar AHORA! +50% Rápido
+          <i class="fas fa-bolt"></i> ¡Saltar AHORA! +50% Rápido
         </button>
-        <button id="skipBtn" class="btn" style="margin-left: 10px;" disabled>
+        <button id="skipBtn" class="btn" disabled>
           <i class="fas fa-forward"></i> Continuar sin anuncio
         </button>
       </div>
       
+      <div class="features-grid">
+        <div class="feature-item">
+          <i class="fas fa-rocket feature-icon"></i>
+          <span class="feature-text">Redirección premium disponible</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-user-shield feature-icon"></i>
+          <span class="feature-text">Protección contra bots activa</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-chart-line feature-icon"></i>
+          <span class="feature-text">Estadísticas en tiempo real</span>
+        </div>
+        <div class="feature-item">
+          <i class="fas fa-globe feature-icon"></i>
+          <span class="feature-text">Servidores globales</span>
+        </div>
+      </div>
+      
       <!-- Banner 300x250 -->
       <div class="ad-container ad-container-300x250">
+        <!-- Espacio reservado para publicidad -->
+      </div>
       
+      <div class="warning-box" style="margin-top: 20px;">
+        <div class="warning-title">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Advertencia</span>
+        </div>
+        <p>No comparta este enlace con otros. Podría contener información personalizada para usted.</p>
       </div>
     </div>
 
-    <div id="errorMessage" class="error-message"></div>
-    <a href="/index.html" class="btn" id="homeLink" style="display: none;">Volver al inicio</a>
+    <!-- Pantalla para bots detectados -->
+    <div id="pantallaBot" style="display: none;" class="bot-detected">
+      <div class="logo">
+        <i class="fas fa-robot logo-icon"></i>
+        <span class="logo-text">URLy</span>
+      </div>
+      <h2>Actividad sospechosa detectada</h2>
+      <p>Hemos identificado que podrías ser un bot o crawler automatizado. Por razones de seguridad, el proceso de redirección se ha detenido.</p>
+      <p>Si eres un usuario real, por favor desactiva cualquier extensión de automatización y recarga la página.</p>
+      <div class="loader" style="border-top-color: var(--error); margin: 30px auto;"></div>
+      <p>Redirigiendo a la página principal en <span id="countdownBot">5</span> segundos...</p>
+    </div>
+
+    <div id="errorMessage" class="error-message" style="display: none;"></div>
+    <a href="/index.html" class="btn" id="homeLink" style="display: none; margin-top: 20px;">
+      <i class="fas fa-home"></i> Volver al inicio
+    </a>
   </div>
 
   <script type="module">
@@ -246,6 +593,7 @@
     const countdown1 = document.getElementById('countdown1');
     const countdown2 = document.getElementById('countdown2');
     const countdown3 = document.getElementById('countdown3');
+    const countdownBot = document.getElementById('countdownBot');
     const btnContinuar = document.getElementById('btnContinuar');
     const skipBtn = document.getElementById('skipBtn');
     const skipAdBtn = document.getElementById('skipAdBtn');
@@ -253,29 +601,119 @@
     const pantalla1 = document.getElementById('pantalla1');
     const pantalla2 = document.getElementById('pantalla2');
     const pantalla3 = document.getElementById('pantalla3');
+    const pantallaBot = document.getElementById('pantallaBot');
+    const urlPreview = document.getElementById('urlPreview');
+    const progressBar1 = document.getElementById('progressBar1');
+    const progressBar2 = document.getElementById('progressBar2');
+    const progressBar3 = document.getElementById('progressBar3');
 
     // Variables globales
     let redirectUrl = '';
     const pathSegments = window.location.pathname.split('/');
     const alias = pathSegments[pathSegments.length - 1] || null;
+    let isHuman = true;
 
-    // Función para detectar bots
+    // Mejorada función para detectar bots
     function isBot() {
-      return /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+      const userAgent = navigator.userAgent;
+      const botPatterns = [
+        /bot/, /googlebot/, /crawler/, /spider/, /robot/, /crawling/,
+        /facebookexternalhit/, /twitterbot/, /rogerbot/, /linkedinbot/,
+        /embedly/, /quora link preview/, /showyoubot/, /outbrain/,
+        /pinterest/, /slackbot/, /vkShare/, /W3C_Validator/, /redditbot/
+      ];
+      
+      // Detectar headless browsers
+      const isHeadless = !navigator.webdriver === false || 
+                        window.callPhantom || 
+                        window._phantom || 
+                        window.phantom;
+      
+      // Detectar automation tools
+      const isAutomation = navigator.webdriver || 
+                          window.domAutomation || 
+                          window.domAutomationController;
+      
+      // Verificar si el navegador soporta ciertas APIs que los bots suelen no soportar
+      const isMissingAPIs = !window.Notification || 
+                           !window.chrome || 
+                           !window.chrome.app || 
+                           !window.Intl;
+      
+      // Comprobar plugins (los bots suelen no tener plugins)
+      const hasNoPlugins = navigator.plugins.length === 0;
+      
+      // Comprobar si el navegado
+      let canExecuteJS = true;
+      try {
+        // Intenta ejecutar código que los bots suelen no poder ejecutar
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (!ctx) canExecuteJS = false;
+      } catch(e) {
+        canExecuteJS = false;
+      }
+      
+      // Combinar todas las pruebas
+      const isLikelyBot = botPatterns.some(pattern => pattern.test(userAgent)) || 
+                         isHeadless || 
+                         isAutomation || 
+                         (isMissingAPIs && hasNoPlugins) || 
+                         !canExecuteJS;
+      
+      return isLikelyBot;
     }
 
-    // Función para iniciar un contador
-    function startCountdown(element, button, callback) {
-      let seconds = 5;
-      element.textContent = seconds;
+    // Función para simular comportamiento humano (movimiento del ratón, teclado, etc.)
+    function simulateHumanBehavior() {
+      // Solo se ejecuta si no es un bot
+      if (!isBot()) {
+        // Simular movimiento del ratón aleatorio
+        document.addEventListener('mousemove', (e) => {
+          isHuman = true;
+        });
+        
+        // Simular actividad de teclado
+        document.addEventListener('keydown', (e) => {
+          isHuman = true;
+        });
+        
+        // Simular scroll
+        document.addEventListener('scroll', (e) => {
+          isHuman = true;
+        });
+        
+        // Simular clicks
+        document.addEventListener('click', (e) => {
+          isHuman = true;
+        });
+      }
+    }
+
+    // Función para iniciar un contador con barra de progreso
+    function startCountdown(element, progressBar, button, seconds, callback) {
+      let remaining = seconds;
+      element.textContent = remaining;
       button.disabled = true;
+      
+      // Resetear barra de progreso
+      if (progressBar) {
+        progressBar.style.width = '0%';
+      }
 
       const interval = setInterval(() => {
-        seconds--;
-        element.textContent = seconds;
-        if (seconds <= 0) {
+        remaining--;
+        element.textContent = remaining;
+        
+        // Actualizar barra de progreso
+        if (progressBar) {
+          const progress = ((seconds - remaining) / seconds) * 100;
+          progressBar.style.width = `${progress}%`;
+        }
+        
+        if (remaining <= 0) {
           clearInterval(interval);
-          button.disabled = false;
+          if (button) button.disabled = false;
           if (callback) callback();
         }
       }, 1000);
@@ -285,8 +723,16 @@
     function mostrarPantalla2() {
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
-      startCountdown(countdown2, btnIrAPagina3, () => {
-        console.log('Botón Página 2 activado');
+      
+      // Actualizar vista previa de URL
+      if (redirectUrl) {
+        urlPreview.textContent = redirectUrl.length > 50 
+          ? redirectUrl.substring(0, 50) + '...' 
+          : redirectUrl;
+      }
+      
+      startCountdown(countdown2, progressBar2, btnIrAPagina3, 10, () => {
+        btnIrAPagina3.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
       });
     }
 
@@ -294,19 +740,34 @@
     function mostrarPantalla3() {
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
-      startCountdown(countdown3, skipBtn, () => {
+      startCountdown(countdown3, progressBar3, null, 15, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
+        skipBtn.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
+        skipAdBtn.innerHTML = '<i class="fas fa-bolt" style="margin-right: 8px;"></i> ¡Saltar AHORA!';
       });
     }
 
     // Mostrar error
     function showError(message) {
       errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
       homeLink.style.display = 'inline-block';
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'none';
+    }
+
+    // Mostrar pantalla de bot
+    function showBotScreen() {
+      pantalla1.style.display = 'none';
+      pantalla2.style.display = 'none';
+      pantalla3.style.display = 'none';
+      pantallaBot.style.display = 'block';
+      
+      startCountdown(countdownBot, null, null, 5, () => {
+        window.location.href = '/index.html';
+      });
     }
 
     // Función para obtener la URL y registrar clics
@@ -359,26 +820,38 @@
     });
 
     // Evento para el botón Continuar en pantalla 1
-    btnContinuar.addEventListener('click', mostrarPantalla2);
+    btnContinuar.addEventListener('click', () => {
+      // Verificar comportamiento humano antes de continuar
+      if (!isHuman) {
+        showBotScreen();
+        return;
+      }
+      mostrarPantalla2();
+    });
 
     // Evento para el botón Continuar en pantalla 2
-    btnIrAPagina3.addEventListener('click', mostrarPantalla3);
+    btnIrAPagina3.addEventListener('click', () => {
+      // Verificar comportamiento humano antes de continuar
+      if (!isHuman) {
+        showBotScreen();
+        return;
+      }
+      mostrarPantalla3();
+    });
 
     // Iniciar proceso
     async function init() {
+      simulateHumanBehavior();
+      
       if (isBot()) {
-        pantalla1.style.display = 'none';
-        errorMessage.textContent = 'Redirección en progreso...';
-        setTimeout(() => {
-          window.location.href = '/index.html';
-        }, 3000);
+        showBotScreen();
         return;
       }
 
       const success = await fetchUrlAndTrack();
       if (success) {
-        startCountdown(countdown1, btnContinuar, () => {
-          console.log('Botón Página 1 activado');
+        startCountdown(countdown1, progressBar1, btnContinuar, 7, () => {
+          btnContinuar.innerHTML = '<i class="fas fa-arrow-right" style="margin-right: 8px;"></i> Continuar';
         });
       }
     }
@@ -394,3 +867,4 @@
   </script>
 </body>
 </html>
+    
