@@ -264,32 +264,6 @@
       return /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
     }
 
-    // Función para mostrar popunders
-    function showPopunder() {
-      try {
-        // Método 1 - Ventana emergente
-        const win = window.open('', '_blank', 'width=1,height=1');
-        if (win) {
-          win.blur();
-          window.focus();
-          setTimeout(() => win.close(), 100);
-        }
-        
-        // Método 2 - Enlace oculto
-        const a = document.createElement('a');
-        a.target = '_blank';
-        a.href = 'about:blank';
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => a.remove(), 100);
-        
-        // Método 3 - Para Monetag (ya está cargado)
-      } catch(e) {
-        console.log('Popunder bloqueado:', e);
-      }
-    }
-
     // Función para iniciar un contador
     function startCountdown(element, button, callback) {
       let seconds = 5;
@@ -309,23 +283,20 @@
 
     // Mostrar pantalla 2 (Espera)
     function mostrarPantalla2() {
-      showPopunder(); // Popunder al cambiar de pantalla
       pantalla1.style.display = 'none';
       pantalla2.style.display = 'block';
       startCountdown(countdown2, btnIrAPagina3, () => {
-        showPopunder(); // Popunder cuando el contador termina
+        console.log('Botón Página 2 activado');
       });
     }
 
     // Mostrar pantalla 3 (Generando URL)
     function mostrarPantalla3() {
-      showPopunder(); // Popunder al cambiar de pantalla
       pantalla2.style.display = 'none';
       pantalla3.style.display = 'block';
       startCountdown(countdown3, skipBtn, () => {
         skipBtn.disabled = false;
         skipAdBtn.disabled = false;
-        showPopunder(); // Popunder cuando el contador termina
       });
     }
 
@@ -393,18 +364,6 @@
     // Evento para el botón Continuar en pantalla 2
     btnIrAPagina3.addEventListener('click', mostrarPantalla3);
 
-    // Eventos adicionales para más popunders
-    document.addEventListener('click', () => {
-      if(Math.random() > 0.7) showPopunder();
-    });
-
-    document.addEventListener('mousemove', (e) => {
-      if(e.clientY < 10) showPopunder(); // Cuando el ratón sube
-    });
-
-    // Popunder periódico cada 15 segundos
-    setInterval(showPopunder, 15000);
-
     // Iniciar proceso
     async function init() {
       if (isBot()) {
@@ -416,12 +375,10 @@
         return;
       }
 
-      showPopunder(); // Popunder inicial
-      
       const success = await fetchUrlAndTrack();
       if (success) {
         startCountdown(countdown1, btnContinuar, () => {
-          showPopunder(); // Popunder cuando el primer contador termina
+          console.log('Botón Página 1 activado');
         });
       }
     }
@@ -434,16 +391,6 @@
     } else {
       showError('Error al cargar los recursos. Recarga la página.');
     }
-  </script>
-  
-  <!-- Script adicional para popunder al salir -->
-  <script>
-    // Popunder cuando el usuario intenta salir
-    document.addEventListener('mouseout', (e) => {
-      if(e.clientY < 5) {
-        showPopunder();
-      }
-    });
   </script>
 </body>
 </html>
