@@ -20,11 +20,12 @@ to = "/ads.txt"
 status = 200
 force = true
 
-[[Redirect]] 
-from = "/https://srv.adstxtmanager.com/73084/urly.lat"
-to = "//ads.txt" 
-status = 301
-force =true
+[[redirects]]
+  from = "/ads.txt"
+  to = "https://srv.adstxtmanager.com/73084/urly.lat"
+  status = 301
+  force = true
+  headers = {X-From = "Netlify"}
 
 [functions]
 directory = "functions"
