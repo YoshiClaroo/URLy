@@ -1,2 +1,8 @@
 /r/:alias    /redirect.html    200
 /*           /index.html       200
+# Redirección de ads.txt para Ezoic
+/ads.txt https://srv.adstxtmanager.com/73084/urly.lat 301
+
+# Redirección de ezoic (requerida para su CDN)
+/* https://your-ezoic-domain.com/:splat 200
+!/.well-known/*
