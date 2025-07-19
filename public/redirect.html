@@ -373,34 +373,63 @@
   <!-- Dinámica -->
   <script async src="https://ss.mrmnd.com/dynamic.js" data-mnddynid="634b77cf-84a0-477c-a91b-c4ce534e22ff"></script>
 
-  <!-- Popunder de monetag -->
-  <script>(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://al5sm.com/tag.min.js',9431067,document.body||document.documentElement)</script>
+  <script>
+  fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => {
+      const country = data.country;
 
-  <!-- Popunder de ExoClick -->
-  <script type="application/javascript">
-    var ad_idzone = "5622566",
-    ad_popup_fallback = false,
-    ad_popup_force = true,
-    ad_chrome_enabled = true,
-    ad_new_tab = true,
-    ad_frequency_period = 10,
-    ad_frequency_count = 3,
-    ad_trigger_method = 1,
-    ad_trigger_delay = 0,
-    ad_capping_enabled = true; 
-</script>
-<script type="application/javascript" src="https://a.pemsrv.com/popunder1000.js"></script>
-  
-  <!-- Notificaciones Push Exoclick -->
-  <script type="application/javascript">
-    pn_idzone = 5676120;
-    pn_sleep_seconds = 0;
-    pn_is_self_hosted = 1;
-    pn_soft_ask = 0;
-    pn_filename = "/worker.js"; 
- </script>
+      // Países donde Monetag suele pagar mejor
+      const monetagPaises = ['AR', 'BR', 'MX', 'CO', 'PE', 'CL', 'EC', 'VE', 'BO', 'GT', 'UY', 'PY', 'HN', 'NI'];
+      // Países donde ExoClick suele tener mejor CPM
+      const exoclickPaises = ['US', 'CA', 'GB', 'FR', 'DE', 'IT', 'ES', 'AU', 'NL', 'SE', 'NO'];
 
- <script type="application/javascript" src="https://js.wpnsrv.com/pn.php"></script>
+      if (monetagPaises.includes(country)) {
+        // Monetag
+        const s = document.createElement('script');
+        s.src = 'https://al5sm.com/tag.min.js';
+        s.setAttribute('data-zone', '9431067');
+        (document.body || document.documentElement).appendChild(s);
+        console.log('Monetag cargado para', country);
+      } else if (exoclickPaises.includes(country)) {
+        // ExoClick
+        const exoScript1 = document.createElement('script');
+        exoScript1.type = 'application/javascript';
+        exoScript1.innerHTML = `
+          var ad_idzone = "5622566",
+              ad_popup_fallback = false,
+              ad_popup_force = true,
+              ad_chrome_enabled = true,
+              ad_new_tab = true,
+              ad_frequency_period = 10,
+              ad_frequency_count = 3,
+              ad_trigger_method = 1,
+              ad_trigger_delay = 0,
+              ad_capping_enabled = true;
+        `;
+        const exoScript2 = document.createElement('script');
+        exoScript2.src = 'https://a.pemsrv.com/popunder1000.js';
+        exoScript2.type = 'application/javascript';
+        document.body.appendChild(exoScript1);
+        document.body.appendChild(exoScript2);
+        console.log('ExoClick cargado para', country);
+      } else {
+        // Por defecto: Monetag
+        const s = document.createElement('script');
+        s.src = 'https://al5sm.com/tag.min.js';
+        s.setAttribute('data-zone', '9431067');
+        (document.body || document.documentElement).appendChild(s);
+        console.log('Default: Monetag cargado para', country);
+      }
+    })
+    .catch(err => {
+      console.error('Error detectando país, cargando Monetag por defecto.', err);
+      const s = document.createElement('script');
+      s.src = 'https://al5sm.com/tag.min.js';
+      s.setAttribute('data-zone', '9431067');
+      (document.body || document.documentElement).appendChild(s);
+    });
+  </script>
 
 
   <div class="redirect-container">
