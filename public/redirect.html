@@ -785,64 +785,51 @@
   </script>
 
   <script>
-  window.addEventListener('load', () => {
-    fetch('https://ipapi.co/json/')
-      .then(res => res.json())
-      .then(data => {
-        const country = data.country;
+(async () => {
+  const monetagCountries = ["US", "CA", "AU", "GB", "DE", "FR", "IT", "ES", "BR", "MX", "AR", "CL"];
+  let userCountry = "XX";
+  let apiFalló = false;
 
-        // Países donde Monetag suele pagar mejor
-        const monetagPaises = ['AR', 'BR', 'MX', 'CO', 'PE', 'CL', 'EC', 'VE', 'BO', 'GT', 'UY', 'PY', 'HN', 'NI'];
+  try {
+    const res = await fetch("https://ipapi.co/json/");
+    const data = await res.json();
+    userCountry = data.country || "XX";
+  } catch (e) {
+    console.warn("Error al detectar país. Se usará ProPush por defecto.");
+    apiFalló = true;
+  }
 
-        // Países donde ExoClick suele rendir más
-        const exoclickPaises = ['US', 'CA', 'GB', 'FR', 'DE', 'IT', 'ES', 'AU', 'NL', 'SE', 'NO'];
+  // --- Función para insertar scripts dinámicamente ---
+  function loadScript(src, attributes = {}) {
+    const s = document.createElement('script');
+    s.src = src;
+    for (const [k, v] of Object.entries(attributes)) {
+      s.setAttribute(k, v);
+    }
+    (document.body || document.documentElement).appendChild(s);
+  }
 
-        if (monetagPaises.includes(country)) {
-          // Monetag
-          const s = document.createElement('script');
-          s.src = 'https://al5sm.com/tag.min.js';
-          s.setAttribute('data-zone', '9431067');
-          (document.body || document.documentElement).appendChild(s);
-          console.log('Monetag cargado para', country);
-        } else if (exoclickPaises.includes(country)) {
-          // ExoClick
-          const exoScript1 = document.createElement('script');
-          exoScript1.type = 'application/javascript';
-          exoScript1.innerHTML = `
-            var ad_idzone = "5622566",
-                ad_popup_fallback = false,
-                ad_popup_force = true,
-                ad_chrome_enabled = true,
-                ad_new_tab = true,
-                ad_frequency_period = 10,
-                ad_frequency_count = 3,
-                ad_trigger_method = 1,
-                ad_trigger_delay = 0,
-                ad_capping_enabled = true;
-          `;
-          const exoScript2 = document.createElement('script');
-          exoScript2.src = 'https://a.pemsrv.com/popunder1000.js';
-          exoScript2.type = 'application/javascript';
-          document.body.appendChild(exoScript1);
-          document.body.appendChild(exoScript2);
-          console.log('ExoClick cargado para', country);
-        } else {
-          // Por defecto: Monetag
-          const s = document.createElement('script');
-          s.src = 'https://al5sm.com/tag.min.js';
-          s.setAttribute('data-zone', '9431067');
-          (document.body || document.documentElement).appendChild(s);
-          console.log('Default: Monetag cargado para', country);
-        }
-      })
-      .catch(err => {
-        console.error('Error detectando país, cargando Monetag por defecto.', err);
-        const s = document.createElement('script');
-        s.src = 'https://al5sm.com/tag.min.js';
-        s.setAttribute('data-zone', '9431067');
-        (document.body || document.documentElement).appendChild(s);
-      });
-  });
+  // --- Configurar Monetag ---
+  function showMonetag() {
+    loadScript('https://al5sm.com/tag.min.js', { 'data-zone': '9431067' });
+  }
+
+  // --- Configurar ProPush ---
+  function showProPush() {
+    const clickUrl = "https://toopsoug.net/4/9596614";
+    document.addEventListener('click', function () {
+      window.onbeforeunload = null;
+      window.open(clickUrl, '_blank', 'noreferrer,noopener');
+    }, { once: true });
+  }
+
+  // --- Lógica inteligente ---
+  if (!apiFalló && monetagCountries.includes(userCountry)) {
+    showMonetag();
+  } else {
+    showProPush(); // Si API falla o el país no está en la lista, va ProPush
+  }
+})();
   </script>
   
 </body>
