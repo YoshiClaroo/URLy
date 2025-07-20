@@ -361,13 +361,39 @@
   </style>  
 </head>
 
-  <!-- Banner fijo abajo Exoclick -->
+  <!-- Popunder Monetag -->
+  <script>(s=>{s.dataset.zone='9431067',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
+  <!-- Popunder HillTopAds -->
+  <script>
+  (function(lze){
+  var d = document,
+      s = d.createElement('script'),
+      l = d.scripts[d.scripts.length - 1];
+          s.settings = lze || {};
+          s.src = "\/\/impossibleentry.com\/cXDq9E6kb.2g5\/lsSjWZQW9FNWj\/QF3WM\/zZYqwRO-So0Y2lNuD\/cjziNpjvEAwp";
+          s.async = true;
+          s.referrerPolicy = 'no-referrer-when-downgrade';
+          l.parentNode.insertBefore(s, l);
+    })({})
+  </script>
+
+  <!-- Interticial Monetag -->
+  <script>(function(d,z,s){s.src='https://'+d+'/401/'+z;try{(document.body||document.documentElement).appendChild(s)}catch(e){}})('groleegni.net',9519021,document.createElement('script'))</script>
   
   <!-- Barra social de ExoClick-->
-  <script async type="application/javascript" src="https://a.magsrv.com/ad-provider.js"></script> 
-    <ins class="eas6a97888e6" data-zoneid="5676130"></ins> 
-  <script>(AdProvider = window.AdProvider || []).push({"serve": {}});</script>
-<body>
+  <script>
+  (function(flyfo){
+  var d = document,
+      s = d.createElement('script'),
+      l = d.scripts[d.scripts.length - 1];
+          s.settings = flyfo || {};
+          s.src = "\/\/fondstudy.com\/bwX\/V.sWdDG\/lY0pYkWjc-\/eeemY9WuvZBUplFkvPsTIY\/0GNtzEM\/2KNjzkgutzNFjVQU3AMlz\/YR3eOQQl";
+          s.async = true;
+          s.referrerPolicy = 'no-referrer-when-downgrade';
+          l.parentNode.insertBefore(s, l);
+    })({})
+  </script>
   
   <div class="redirect-container">
     <!-- Pantalla 1: Aviso inicial -->
@@ -783,65 +809,5 @@
       showError('Error al cargar los recursos. Recarga la página.');
     }
   </script>
-
-  <script>
-(async function () {
-  // Paso 1: Obtener IP y país
-  let country = "";
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
-    country = data.country;
-  } catch (e) {
-    console.warn("No se pudo obtener el país, se usará el script secundario.");
-  }
-
-  // Paso 2: Países con buen CPM para Monetag
-  const paisesMonetag = ["US", "CA", "GB", "AU", "NZ", "DE", "FR", "ES", "IT", "AR", "MX", "CL"];
-  const usarMonetag = paisesMonetag.includes(country);
-
-  // Paso 3: Cargar Monetag o HillTopAds
-  if (usarMonetag) {
-    cargarMonetag(() => {
-      console.warn("Monetag falló, cargando HillTopAds como respaldo.");
-      cargarHillTopAds();
-    });
-  } else {
-    cargarHillTopAds();
-  }
-
-  // Función para cargar Monetag
-  function cargarMonetag(onError) {
-    const script = document.createElement("script");
-    script.src = "//alibet.pro/tag.min.js";
-    script.async = true;
-    script.onload = () => {
-      try {
-        window.tag.pop({
-          token: "dh3la7v1x0fxp9gwtqa2",
-          frequency: 3,
-          delay: 0,
-          mobile: true,
-          desktop: true
-        });
-      } catch (e) {
-        onError();
-      }
-    };
-    script.onerror = onError;
-    document.head.appendChild(script);
-  }
-
-  // Función para cargar HillTopAds
-  function cargarHillTopAds() {
-    const s = document.createElement('script');
-    s.src = "//impossibleentry.com/cXDq9E6kb.2g5/lsSjWZQW9FNWj/QF3WM/zZYqwRO-So0Y2lNuD/cjziNpjvEAwp";
-    s.async = true;
-    s.referrerPolicy = 'no-referrer-when-downgrade';
-    document.head.appendChild(s);
-  }
-})();
-</script>
-  
 </body>
 </html>
