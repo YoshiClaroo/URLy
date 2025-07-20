@@ -785,52 +785,63 @@
   </script>
 
   <script>
-(async () => {
-  const monetagCountries = ["US", "CA", "AU", "GB", "DE", "FR", "IT", "ES", "BR", "MX", "AR", "CL"];
-  let userCountry = "XX";
-  let apiFalló = false;
-
+(async function () {
+  // Paso 1: Obtener IP y país
+  let country = "";
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
-    userCountry = data.country || "XX";
+    country = data.country;
   } catch (e) {
-    console.warn("Error al detectar país. Se usará ProPush por defecto.");
-    apiFalló = true;
+    console.warn("No se pudo obtener el país, se usará el script secundario.");
   }
 
-  // --- Función para insertar scripts dinámicamente ---
-  function loadScript(src, attributes = {}) {
-    const s = document.createElement('script');
-    s.src = src;
-    for (const [k, v] of Object.entries(attributes)) {
-      s.setAttribute(k, v);
-    }
-    (document.body || document.documentElement).appendChild(s);
-  }
+  // Paso 2: Países con buen CPM para Monetag
+  const paisesMonetag = ["US", "CA", "GB", "AU", "NZ", "DE", "FR", "ES", "IT", "AR", "MX", "CL"];
+  const usarMonetag = paisesMonetag.includes(country);
 
-  // --- Configurar Monetag ---
-  function showMonetag() {
-    loadScript('https://al5sm.com/tag.min.js', { 'data-zone': '9431067' });
-  }
-
-  // --- Configurar ProPush ---
-  function showProPush() {
-    const clickUrl = "https://toopsoug.net/4/9596614";
-    document.addEventListener('click', function () {
-      window.onbeforeunload = null;
-      window.open(clickUrl, '_blank', 'noreferrer,noopener');
-    }, { once: true });
-  }
-
-  // --- Lógica inteligente ---
-  if (!apiFalló && monetagCountries.includes(userCountry)) {
-    showMonetag();
+  // Paso 3: Cargar Monetag o HillTopAds
+  if (usarMonetag) {
+    cargarMonetag(() => {
+      console.warn("Monetag falló, cargando HillTopAds como respaldo.");
+      cargarHillTopAds();
+    });
   } else {
-    showProPush(); // Si API falla o el país no está en la lista, va ProPush
+    cargarHillTopAds();
+  }
+
+  // Función para cargar Monetag
+  function cargarMonetag(onError) {
+    const script = document.createElement("script");
+    script.src = "//alibet.pro/tag.min.js";
+    script.async = true;
+    script.onload = () => {
+      try {
+        window.tag.pop({
+          token: "dh3la7v1x0fxp9gwtqa2",
+          frequency: 3,
+          delay: 0,
+          mobile: true,
+          desktop: true
+        });
+      } catch (e) {
+        onError();
+      }
+    };
+    script.onerror = onError;
+    document.head.appendChild(script);
+  }
+
+  // Función para cargar HillTopAds
+  function cargarHillTopAds() {
+    const s = document.createElement('script');
+    s.src = "//impossibleentry.com/cXDq9E6kb.2g5/lsSjWZQW9FNWj/QF3WM/zZYqwRO-So0Y2lNuD/cjziNpjvEAwp";
+    s.async = true;
+    s.referrerPolicy = 'no-referrer-when-downgrade';
+    document.head.appendChild(s);
   }
 })();
-  </script>
+</script>
   
 </body>
 </html>
